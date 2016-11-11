@@ -1,1 +1,2 @@
-"# acr-web-manager" 
+# Azure Container Registry Web Manager
+
