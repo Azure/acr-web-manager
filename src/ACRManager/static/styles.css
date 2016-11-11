@@ -1,0 +1,246 @@
+body {
+    margin: 0;
+}
+
+a {
+    text-decoration: inherit;
+    color: inherit;
+}
+
+pre {
+    font-family: "Consolas", monospace;
+}
+
+.header {
+    height: 100px;
+}
+
+.header-auth-panel {
+    height: 70px;
+}
+
+.banner {
+    margin: auto;
+}
+
+.banner-primary {
+    padding-top: 50px;
+}
+
+.header-secondary {
+    height: 50px;
+}
+
+.banner-secondary {
+    height: 50px;
+    margin: auto;
+}
+
+@media (min-width: 1024px) {
+    .banner {
+        width: 1024px;
+    }
+
+    .banner-secondary {
+        width: 1024px;
+    }
+}
+
+.banner a {
+    display: inline-block;
+}
+
+.banner-secondary a {
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.banner-title a {
+    float: left;
+}
+
+.banner-login-group {
+    text-align: right;
+    float: right;
+}
+
+.banner-logged-in {
+    display: block;
+}
+.banner-logout {
+    text-decoration: underline;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.banner-auth-row {
+    display: block;
+    margin-top: 18px;
+}
+
+.banner-auth-row-login-button {
+    width: 100%;
+}
+
+.banner-auth-row-info {
+    margin-top: 4px;
+    display: inline-block;
+}
+
+.page {
+    margin: auto;
+}
+
+@media (min-width: 1024px) {
+    .page {
+        width: 1024px;
+    }
+}
+
+.login {
+    height: 500px;
+}
+
+.login-title {
+    padding-top: 100px;
+    margin: auto;
+    text-align: center;
+    height: 50px;
+}
+
+.login-panel {
+    margin: auto;
+    height: 200px;
+    width: 400px;
+}
+
+.login-field {
+    margin-bottom: 30px;
+}
+
+.login-button {
+    text-align: center;
+    width: 100px;
+    margin: auto;
+}
+
+.login-message {
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.breadcrumb li a {
+    max-width: 320px !important;
+}
+.breadcrumb {
+    margin-bottom: 20px !important;
+}
+
+.repo-list-item::before {
+    content: none;
+}
+.repo-list-item:hover {
+    cursor: default !important;
+}
+.repo-list-item {
+    border-top: 1px solid #EEE;
+    border-bottom: 1px solid #EEE;
+}
+
+.repo-list-item-tags-item::before {
+    content: none;
+}
+.repo-list-item-tags-item:hover {
+    background-color: #DDD !important;
+}
+.repo-list-item-tags-item {
+}
+.repo-list-item-tags-icon {
+    position: absolute;
+    left: 10px;
+    top: 12px;
+}
+
+.repo-list-icon {
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    float: left;
+    margin-right: 20px;
+}
+
+.repo-list-icon-svg {
+    margin-top: 6px;
+}
+
+.repo-list-content {
+    display: inline-block;
+    float: left;
+}
+
+.repo-list-item-tags-showhide {
+    cursor: pointer;
+    display: inline;
+    padding-right: 0px;
+}
+
+.tag-viewer-list {
+    overflow: auto;
+    height: 650px;
+}
+
+.tag-viewer-panel {
+    overflow: auto;
+    height: 650px;
+}
+
+.manifest-entry {
+    border-bottom: 1px solid #AAA;
+    padding-bottom: 12px;
+    padding-top: 10px;
+    margin: 0px 0px;
+}
+
+.manifest-entry:last-child {
+    border-bottom: none;
+}
+
+.manifest-entry ul {
+    padding: 0;
+    margin: 0;
+}
+
+.manifest-entry li {
+    padding-left: 20px;
+    position: relative;
+    list-style: none;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #AAA;
+}
+
+.manifest-entry li:last-child {
+    border-bottom: none;
+}
+
+.manifest-entry span {
+    display: block;
+}
+
+.manifest-entry pre {
+    margin: 0;
+    overflow-x: auto;
+    display: inline-block;
+    max-width: 100%;
+    background: #EEE;
+}
+
+.clickable {
+    cursor: pointer !important;
+}
+.clickable:hover {
+    cursor: pointer !important;
+}
+
+.body-bottom-padding {
+    padding-bottom: 150px;
+}

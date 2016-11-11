@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  acrmanager:
+    image: user/acrmanager${TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80"
