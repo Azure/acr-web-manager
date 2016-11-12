@@ -134,7 +134,7 @@ export class Docker {
             });
     }
 
-    tryAuthenticateSP(cred: RegistryCredentials, cancel: CancelToken = null): Promise<boolean> {
+    tryAuthenticate(cred: RegistryCredentials, cancel: CancelToken = null): Promise<boolean> {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,

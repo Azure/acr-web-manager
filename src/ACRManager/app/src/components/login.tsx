@@ -98,7 +98,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
 
         this.cancel = service.createCancelToken();
 
-        service.tryAuthenticateSP(cred, this.cancel.token)
+        service.tryAuthenticate(cred, this.cancel.token)
             .then((success: boolean) => {
                 this.cancel = null;
 
