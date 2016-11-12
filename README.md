@@ -1,11 +1,22 @@
 # Azure Container Registry Web Manager
 
-How to build:
-- Open solution in Visual Studio
-- Set build type to "IIS Express" to run natively, "Docker" to run in a container
-- Build project
-- `cd app`
+# Running locally
+Docker:
+- `docker run -it -p 5050:80 azurecr/web-manager`
+
+# Build instructions
+- `cd src\ACRManager\app`
 - `npm install`
-- `gulp watch`
-- If built to run natively, run in visual studio
-- If built for docker, run `docker run -it -p 5050:80 user/acrmanager`
+- `gulp`
+
+Visual Studio:
+- Open src\ACRManager\ACRManager.sln in Visual Studio
+- Set build type to "IIS Express" to run natively, "Docker" to run in a container
+- Start debugging
+- If built using docker, the image can be run manually:
+- `docker run -it -p 5050:80 user/acrmanager`
+
+Command-line:
+- `cd src\ACRManager`
+- `dotnet restore`
+- `dotnet run`
