@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using WebManager.Services;
+using WebManager.Utility;
 
 namespace WebManager
 {
-    public class DockerCredential
-    {
-        public string Registry { get; set; }
-        public string BasicAuth { get; set; }
-    }
-
     public class ApiController : Controller
     {
         private DockerApiService _service;
@@ -19,7 +14,7 @@ namespace WebManager
             _service = service;
         }
 
-        public DockerCredential GetDockerCredential()
+        public RegistryCredential GetDockerCredential()
         {
             if (!Request.Headers.ContainsKey("Authorization"))
             {
@@ -45,7 +40,7 @@ namespace WebManager
                 return null;
             }
 
-            return new DockerCredential() { BasicAuth = basicAuth, Registry = Request.Headers["Registry"] };
+            return new RegistryCredential() { BasicAuth = basicAuth, Registry = Request.Headers["Registry"] };
         }
 
         /// <summary>
@@ -56,7 +51,7 @@ namespace WebManager
         [HttpGet]
         public async Task<IActionResult> Catalog()
         {
-            DockerCredential cred = GetDockerCredential();
+            RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
@@ -86,7 +81,7 @@ namespace WebManager
         [HttpGet]
         public async Task<IActionResult> Manifest(string repo, string tag)
         {
-            DockerCredential cred = GetDockerCredential();
+            RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
@@ -115,7 +110,7 @@ namespace WebManager
         [HttpGet]
         public async Task<IActionResult> ListTags(string name)
         {
-            DockerCredential cred = GetDockerCredential();
+            RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
@@ -145,7 +140,7 @@ namespace WebManager
         [HttpGet]
         public async Task<IActionResult> VerifyCredential()
         {
-            DockerCredential cred = GetDockerCredential();
+            RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();

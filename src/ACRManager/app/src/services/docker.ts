@@ -1,7 +1,7 @@
 ﻿import axios from "axios"
 import { AxiosRequestConfig, AxiosResponse, CancelToken, CancelTokenSource } from "axios";
 import { Promise } from "es6-promise";
-import { CredentialService, SPNCredential } from "./credential";
+import { CredentialService, RegistryCredentials } from "./credential";
 
 export class Docker {
     private credService: CredentialService = new CredentialService();
@@ -20,7 +20,7 @@ export class Docker {
     // through the server in order to satisfy CORS policies
     getRepos(maxResults: number | null = 10, last: string = null, cancel: CancelToken = null):
         Promise<{ repositories: string[], httpLink: string }> {
-        let cred: SPNCredential = this.credService.getSPNCredential(this.registryName);
+        let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ repositories: null, httpLink: null });
         }
@@ -58,7 +58,7 @@ export class Docker {
 
     getManifest(repo: string, tag: string, cancel: CancelToken = null):
         Promise<{ manifest: string }> {
-        let cred: SPNCredential = this.credService.getSPNCredential(this.registryName);
+        let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ manifest: null });
         }
@@ -93,7 +93,7 @@ export class Docker {
     // this will just return all the tags at once
     getTagsForRepo(repo: string, maxResults: number | null = 10, last: string = null, cancel: CancelToken = null):
         Promise<{ tags: string[], httpLink: string }> {
-        let cred: SPNCredential = this.credService.getSPNCredential(this.registryName);
+        let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ tags: null, httpLink: null });
         }
@@ -134,7 +134,7 @@ export class Docker {
             });
     }
 
-    tryAuthenticateSP(cred: SPNCredential, cancel: CancelToken = null): Promise<boolean> {
+    tryAuthenticateSP(cred: RegistryCredentials, cancel: CancelToken = null): Promise<boolean> {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
@@ -147,7 +147,7 @@ export class Docker {
         return axios.get("/api/v2", config)
             .then((r: AxiosResponse) => {
                 if (r.status === 200) {
-                    this.credService.setSPNCredential(this.registryName, cred);
+                    this.credService.setRegistryCredentials(this.registryName, cred);
                     return true;
                 }
                 return false;

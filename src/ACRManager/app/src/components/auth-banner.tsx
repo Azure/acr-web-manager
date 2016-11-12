@@ -5,7 +5,7 @@ import {
     ButtonType
 } from "office-ui-fabric-react/lib/Button";
 
-import { SPNCredential, CredentialService } from "../services/credential";
+import { RegistryCredentials, CredentialService } from "../services/credential";
 import { Docker } from "../services/docker";
 
 export interface IAuthBannerProps {
@@ -36,7 +36,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
     }
 
     componentWillMount(): void {
-        let credential = this.credService.getSPNCredential(this.props.service.registryName);
+        let credential = this.credService.getRegistryCredentials(this.props.service.registryName);
         this.setState({
             loggedInAs: credential != null ? credential.username : null
         } as IAuthBannerState);
@@ -78,7 +78,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
             loggedInAs: null
         } as IAuthBannerState);
 
-        this.credService.setSPNCredential(this.props.service.registryName, null);
+        this.credService.setRegistryCredentials(this.props.service.registryName, null);
 
         if (this.props.onLogout) {
             this.props.onLogout();
@@ -90,7 +90,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
             return;
         }
 
-        let cred: SPNCredential = new SPNCredential();
+        let cred: RegistryCredentials = new RegistryCredentials();
         cred.username = this.state.formUsername;
         cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
 
@@ -109,7 +109,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                         loggedInAs: cred.username
                     } as IAuthBannerState);
 
-                    this.credService.setSPNCredential(this.props.service.registryName, cred);
+                    this.credService.setRegistryCredentials(this.props.service.registryName, cred);
 
                     if (this.props.onLogin) {
                         this.props.onLogin();

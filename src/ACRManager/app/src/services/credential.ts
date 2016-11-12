@@ -1,4 +1,4 @@
-export class SPNCredential {
+export class RegistryCredentials {
     basicAuth: string;
     username: string;
 }
@@ -6,12 +6,12 @@ export class SPNCredential {
 export class CredentialService {
     private storagePrefix: string = "ACRManager/Portal/";
 
-    getSPNCredential(reg: string): SPNCredential {
-        let v: any = sessionStorage.getItem(this.storagePrefix + "SPNCredential/" + reg);
-        return v ? <SPNCredential>JSON.parse(v) : null;
+    getRegistryCredentials(reg: string): RegistryCredentials {
+        let v: any = sessionStorage.getItem(this.storagePrefix + "RegistryCredential/" + reg);
+        return v ? <RegistryCredentials>JSON.parse(v) : null;
     }
 
-    setSPNCredential(reg: string, v: SPNCredential): void {
-        sessionStorage.setItem(this.storagePrefix + "SPNCredential/" + reg, JSON.stringify(v));
+    setRegistryCredentials(reg: string, v: RegistryCredentials): void {
+        sessionStorage.setItem(this.storagePrefix + "RegistryCredential/" + reg, JSON.stringify(v));
     }
 }

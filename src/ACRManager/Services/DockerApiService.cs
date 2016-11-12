@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using WebManager.Utility;
 
 namespace WebManager.Services
 {
@@ -45,7 +46,7 @@ namespace WebManager.Services
         /// If authentication failed, returns null.
         /// If any other error occured, throws an exception.
         /// </summary>
-        public async Task<Tuple<string, HttpStatusCode, string>> ListTags(DockerCredential cred, string repoName, string queryString)
+        public async Task<Tuple<string, HttpStatusCode, string>> ListTags(RegistryCredential cred, string repoName, string queryString)
         {
             try
             {
@@ -77,7 +78,7 @@ namespace WebManager.Services
         /// If any other error occured, throws an exception.
         /// </summary>
         /// <returns>A tuple containing the result, and the HTTP Link header.</returns>
-        public async Task<Tuple<string, HttpStatusCode, string>> Catalog(DockerCredential cred, string queryString)
+        public async Task<Tuple<string, HttpStatusCode, string>> Catalog(RegistryCredential cred, string queryString)
         {
             try
             {
@@ -105,7 +106,7 @@ namespace WebManager.Services
         /// <summary>
         /// Reads a manifest.
         /// </summary>
-        public async Task<Tuple<string, HttpStatusCode>> Manifest(DockerCredential cred, string repo, string tag)
+        public async Task<Tuple<string, HttpStatusCode>> Manifest(RegistryCredential cred, string repo, string tag)
         {
             try
             {
