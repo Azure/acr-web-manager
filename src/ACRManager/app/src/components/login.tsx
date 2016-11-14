@@ -44,8 +44,6 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             domain = url.split('/')[0];
         }
 
-        domain = domain.split(':')[0];
-
         return domain;
     }
 
@@ -114,6 +112,10 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                 }
             }).catch((err: any) => {
                 this.cancel = null;
+
+                this.setState({
+                    formMessage: "Network error"
+                } as ILoginState);
             });
     }
 
