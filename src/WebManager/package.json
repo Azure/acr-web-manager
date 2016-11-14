@@ -1,14 +1,15 @@
 {
-    "name": "app",
+    "name": "WebManager",
     "version": "1.0.0",
-    "description": "",
+    "description": "Web management portal for Azure Container Registry services.",
+    "repository": "https://github.com/azure/acr-web-manager",
     "main": "src/index.tsx",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
-    "license": "ISC",
-    "dependencies": {
+    "license": "MIT",
+    "devDependencies": {
         "@types/history": "2.0.39",
         "@types/react": "0.14.43",
         "@types/react-dom": "^0.14.18",
@@ -19,9 +20,7 @@
         "react-dom": "^15.3.2",
         "react-router": "3.0.0",
         "react-json-tree": "0.10.0",
-        "office-ui-fabric-react": "0.63.4"
-    },
-    "devDependencies": {
+        "office-ui-fabric-react": "0.63.4",
         "gulp": "3.9.1",
         "gulp-clean": "0.3.2",
         "source-map-loader": "^0.1.5",

@@ -56,19 +56,19 @@ namespace WebManager
             app.UseMvc(routes =>
             {
                 routes.MapRoute("ACRManager.API.Catalog",
-                    "api/v2/_catalog",
+                    "v2/_catalog",
                     new { controller = "Api", action = "Catalog" }
                 );
                 routes.MapRoute("ACRManager.API.Manifest",
-                    "api/v2/{repo}/manifests/{tag}",
+                    "v2/{repo}/manifests/{tag}",
                     new { controller = "Api", action = "Manifest" }
                 );
                 routes.MapRoute("ACRManager.API.ListTags",
-                    "api/v2/{name}/tags/list",
+                    "v2/{name}/tags/list",
                     new { controller = "Api", action = "ListTags" }
                 );
                 routes.MapRoute("ACRManager.API.VerifyCredential",
-                    "api/v2",
+                    "v2/",
                     new { controller = "Api", action = "VerifyCredential" }
                 );
 
