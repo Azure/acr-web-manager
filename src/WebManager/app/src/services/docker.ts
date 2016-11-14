@@ -9,7 +9,7 @@ export class Docker {
 
     constructor(public registryName: string) {
         this.registryEndpoint = "https://" + this.registryName;
-        this.registryEndpoint = null;
+        // this.registryEndpoint = null;
     }
 
     createCancelToken(): CancelTokenSource {
@@ -30,7 +30,6 @@ export class Docker {
             baseURL: this.registryEndpoint,
             params: { },
             headers: {
-                "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
@@ -42,7 +41,7 @@ export class Docker {
             config.params.last = last;
         }
 
-        return axios.get("/api/v2/_catalog", config)
+        return axios.get("/v2/_catalog", config)
             .then((r: AxiosResponse) => {
                 return { repositories: r.data.repositories, httpLink: r.headers.link }
             }).catch((e: any) => {
@@ -70,12 +69,11 @@ export class Docker {
             headers: {
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
                     "application/vnd.docker.distribution.manifest.v1+json; 0.5",
-                "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
 
-        return axios.get(`/api/v2/${repo}/manifests/${tag}`, config)
+        return axios.get(`/v2/${repo}/manifests/${tag}`, config)
             .then((r: AxiosResponse) => {
                 return { manifest: r.data }
             }).catch((e: any) => {
@@ -103,7 +101,6 @@ export class Docker {
             baseURL: this.registryEndpoint,
             params: { },
             headers: {
-                "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
@@ -115,7 +112,7 @@ export class Docker {
             config.params.last = last;
         }
 
-        return axios.get(`/api/v2/${repo}/tags/list`, config)
+        return axios.get(`/v2/${repo}/tags/list`, config)
             .then((r: AxiosResponse) => {
                 if (r.data.tags === undefined) {
                     console.log(r.data.errors)
@@ -139,12 +136,11 @@ export class Docker {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
             headers: {
-                "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
         }
 
-        return axios.get("/api/v2", config)
+        return axios.get("/v2/", config)
             .then((r: AxiosResponse) => {
                 if (r.status === 200) {
                     this.credService.setRegistryCredentials(this.registryName, cred);

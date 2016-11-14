@@ -1,9 +1,9 @@
 src/**/bin
 src/**/obj
-src/ACRManager/wwwroot
-src/ACRManager/app/node_modules
-src/ACRManager/app/dist
-src/ACRManager/app/**/*npm-debug.log.*
+src/WebManager/wwwroot
+src/WebManager/app/node_modules
+src/WebManager/app/dist
+src/WebManager/app/**/*npm-debug.log.*
 src/**/*.xproj.user
 src/**/project.lock.json
 src/.vs/

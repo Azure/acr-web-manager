@@ -14,7 +14,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "ACRManager": {
+    "WebManager": {
       "commandName": "Project",
       "launchUrl": "http://localhost:5050/",
       "environmentVariables": {
