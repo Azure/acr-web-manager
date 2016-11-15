@@ -1,8 +1,8 @@
 version: '2'
 
 services:
-  acrmanager:
-    image: user/acrmanager${TAG}
+  webmanager:
+    image: user/webmanager${TAG}
     build:
       context: .
       dockerfile: Dockerfile

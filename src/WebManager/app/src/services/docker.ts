@@ -8,7 +8,8 @@ export class Docker {
     private registryEndpoint: string;
 
     constructor(public registryName: string) {
-        this.registryEndpoint = "https://" + this.registryName;
+        // this.registryEndpoint = "https://" + this.registryName;
+        this.registryEndpoint = null;
     }
 
     createCancelToken(): CancelTokenSource {
@@ -29,6 +30,7 @@ export class Docker {
             baseURL: this.registryEndpoint,
             params: { },
             headers: {
+                "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
@@ -66,6 +68,7 @@ export class Docker {
             baseURL: this.registryEndpoint,
             params: { },
             headers: {
+                "Registry": this.registryName,
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
                     "application/vnd.docker.distribution.manifest.v1+json; 0.5",
                 "Authorization": "Basic " + cred.basicAuth
@@ -100,6 +103,7 @@ export class Docker {
             baseURL: this.registryEndpoint,
             params: { },
             headers: {
+                "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
@@ -135,6 +139,7 @@ export class Docker {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
             headers: {
+                "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
         }

@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  acrmanager:
+  webmanager:
     labels:
       - "com.microsoft.visualstudio.targetoperatingsystem=linux"
     volumes:

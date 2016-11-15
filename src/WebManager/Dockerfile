@@ -1,5 +1,5 @@
 FROM microsoft/aspnetcore:1.0.1
-ENTRYPOINT ["dotnet", "ACRManager.dll"]
+ENTRYPOINT ["dotnet", "WebManager.dll"]
 ARG source=.
 WORKDIR /app
 EXPOSE 80
