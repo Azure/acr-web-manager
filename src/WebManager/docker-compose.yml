@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  webmanager:
+    image: user/webmanager${TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80"

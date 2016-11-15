@@ -1,0 +1,32 @@
+﻿<html>
+<head>
+    <title>ACR Web Manager</title>
+    <meta charset="UTF-8">
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://appsforoffice.microsoft.com/fabric/2.6.1/fabric.components.min.css">
+    <link rel="stylesheet" href="https://appsforoffice.microsoft.com/fabric/2.6.1/fabric.min.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="ms-font-m">
+    <div class="header-secondary ms-bgColor-black">
+        <div class="banner-secondary">
+            <span class="banner-secondary-title ms-font-xl ms-fontColor-themeLight">
+                <a href="https://azure.com/">
+                    Microsoft Azure
+                </a>
+            </span>
+        </div>
+    </div>
+
+    <div id="router">
+        <div id="app-loading" class="app-loading ms-fontColor-black"></div>
+    </div>
+
+    <script src="/scripts/react/dist/react.js"></script>
+    <script src="/scripts/react-dom/dist/react-dom.js"></script>
+    <script src="/app/dist/bundle.js"></script>
+
+    <div class="body-bottom-padding"></div>
+</body>
+</html>

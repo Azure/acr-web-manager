@@ -1,0 +1,11 @@
+src/**/bin
+src/**/obj
+src/WebManager/wwwroot
+src/WebManager/node_modules
+src/WebManager/app/dist
+src/WebManager/**/*npm-debug.log.*
+src/**/*.xproj.user
+src/**/project.lock.json
+src/.vs/
+*.swp
+*~
