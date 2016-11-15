@@ -16,3 +16,5 @@ Docker:
 - `dotnet publish -c Release`
 - `docker build -t acrmanager bin/Release/netcoreapp1.0/publish`
 - `docker run -p 5000:80 -it --rm acrmanager`
+
+![alt Web Manager animation](docs/assets/web-manager.gif)
