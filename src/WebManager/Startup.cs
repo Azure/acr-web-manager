@@ -37,8 +37,10 @@ namespace WebManager
             services.AddMvc().AddWebApiConventions();
 
             services.AddSingleton(typeof(DockerApiService));
+            services.AddSingleton(typeof(OauthService));
 
             services.AddOptions();
+            services.Configure<ProgramOptions>(Configuration.GetSection("Options"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -70,6 +72,19 @@ namespace WebManager
                 routes.MapRoute("ACRManager.API.VerifyCredential",
                     "v2/",
                     new { controller = "Api", action = "VerifyCredential" }
+                );
+
+                routes.MapRoute("WebManager.Login.GetCallback",
+                    "login/callback",
+                    new { controller = "Login", action = "GetCallback" }
+                );
+                routes.MapRoute("WebManager.Login.PostCallback",
+                    "login/callback",
+                    new { controller = "Login", action = "PostCallback" }
+                );
+                routes.MapRoute("WebManager.Login.Oidc",
+                    "login/oidc",
+                    new { controller = "Login", action = "Oidc" }
                 );
 
                 routes.MapRoute("default0",

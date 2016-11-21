@@ -7,22 +7,17 @@ namespace WebManager
 {
     public class AppController : Controller
     {
-        private readonly IHostingEnvironment _hostEnvironment;
         private string _indexFile = null;
 
         public AppController(IHostingEnvironment env)
         {
-            _hostEnvironment = env;
+            _indexFile = System.IO.File.ReadAllText(
+                Path.Combine(env.WebRootPath, "index.html"));
         }
 
         [HttpGet]
         public IActionResult Index(string registry)
         {
-            if (_indexFile == null)
-            {
-                _indexFile = System.IO.File.ReadAllText(
-                    Path.Combine(_hostEnvironment.WebRootPath, "index.html"));
-            }
             return new ContentResult()
             {
                 Content = _indexFile,

@@ -1,4 +1,4 @@
-﻿namespace WebManager.Utility
+﻿namespace WebManager.Utilities
 {
     public class RegistryCredential
     {

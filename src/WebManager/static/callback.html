@@ -1,0 +1,26 @@
+﻿<html>
+<head>
+    <script>
+        window.onload = function () {{
+            sessionStorage.setItem("ACRManager/Portal/AADCredential", JSON.stringify(
+                {{
+                    access: document.getElementById("aad_access").value,
+                    refresh: document.getElementById("aad_refresh").value,
+                    expiresOn: parseInt(document.getElementById("aad_expires_on").value),
+                    scope: document.getElementById("aad_scope").value,
+                    resource: document.getElementById("aad_resource").value
+                }}));
+            window.location = document.getElementById("redirect_to").value;
+        }};
+    </script>
+</head>
+<body>
+    <input type="hidden" id="redirect_to" value="{0}" />
+    <input type="hidden" id="aad_access" value="{1}" />
+    <input type="hidden" id="aad_refresh" value="{2}" />
+    <input type="hidden" id="aad_expires_on" value="{3}" />
+    <input type="hidden" id="aad_scope" value="{4}" />
+    <input type="hidden" id="aad_resource" value="{5}" />
+    Loading...
+</body>
+</html>

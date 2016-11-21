@@ -3,6 +3,14 @@ export class RegistryCredentials {
     username: string;
 }
 
+export class AADCredentials {
+    access: string;
+    refresh: string;
+    scope: string;
+    resource: string;
+    expiresOn: number;
+}
+
 export class CredentialService {
     private storagePrefix: string = "ACRManager/Portal/";
 
@@ -13,5 +21,14 @@ export class CredentialService {
 
     setRegistryCredentials(reg: string, v: RegistryCredentials): void {
         sessionStorage.setItem(this.storagePrefix + "RegistryCredential/" + reg, JSON.stringify(v));
+    }
+
+    getAADCredentials(): AADCredentials {
+        let v: any = sessionStorage.getItem(this.storagePrefix + "AADCredential");
+        return v ? <AADCredentials>JSON.parse(v) : null;
+    }
+
+    setAADCredentials(v: AADCredentials): void {
+        sessionStorage.setItem(this.storagePrefix + "AADCredential", JSON.stringify(v));
     }
 }
