@@ -8,6 +8,9 @@ export class Docker {
     private registryEndpoint: string;
 
     constructor(public registryName: string) {
+        // Note: To remove dependency on API proxy once CORS is enabled,
+        // uncomment the below line and delete the line below it
+        // Also, remove the "Registry: " header from the four API calls below
         // this.registryEndpoint = "https://" + this.registryName;
         this.registryEndpoint = null;
     }

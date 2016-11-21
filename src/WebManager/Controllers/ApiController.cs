@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using WebManager.Services;
-using WebManager.Utility;
+using WebManager.Utilities;
 
 namespace WebManager
 {

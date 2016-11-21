@@ -4,6 +4,7 @@ src/WebManager/wwwroot
 src/WebManager/node_modules
 src/WebManager/app/dist
 src/WebManager/**/*npm-debug.log.*
+src/WebManager/appsettings.json
 src/**/*.xproj.user
 src/**/project.lock.json
 src/.vs/
