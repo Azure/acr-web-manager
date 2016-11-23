@@ -38,7 +38,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
 
     componentWillMount(): void {
         let basic = this.credService.getBasicCredentials(this.props.service.registryName);
-        let bearer = this.credService.getBasicCredentials(this.props.service.registryName);
+        let bearer = this.credService.getBearerCredentials(this.props.service.registryName);
 
         if (basic || bearer) {
             if (this.props.onLogin) {
@@ -51,7 +51,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
         }
         else {
             this.cancel = this.props.service.createCancelToken();
-            this.props.service.getBearerChallenge(this.cancel.token)
+            this.props.service.getBearerChallenge("/v2/", this.cancel.token)
                 .then(challenge => {
                     this.cancel = null;
 
@@ -75,7 +75,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                                 }
 
                                 this.setState({
-                                    loggedInAs: bearer ? "Active Directory user" : basic.username
+                                    loggedInAs: "Active Directory user"
                                 } as IAuthBannerState);
                             }
                             else {
@@ -238,7 +238,7 @@ class LoginPanel extends React.Component<ILoginPanelProps, {}> {
             return (
                 <div className="banner-login-group">
                     <span className="banner-logged-in ms-font-l ms-fontColor-themeLight">
-                        Logged in as user {this.props.loggedInAs}
+                        Logged in as {this.props.loggedInAs}
                     </span>
                     <span className="banner-logout ms-font-l ms-fontColor-themeLight" onClick={this.props.onLogout}>
                         (log out)

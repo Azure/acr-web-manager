@@ -95,8 +95,6 @@ namespace WebManager.Services
             StringBuilder queryString = new StringBuilder();
             queryString.Append("?client_id=");
             queryString.Append(_opts.ClientId);
-            // queryString.Append("&resource=");
-            // queryString.Append(_opts.ManagementResource);
             queryString.Append("&redirect_uri=");
             queryString.Append(_opts.LoginRedirectEndpoint);
             queryString.Append("&state=");
