@@ -1,6 +1,10 @@
-export class RegistryCredentials {
+export class BasicCredentials {
     basicAuth: string;
     username: string;
+}
+
+export class BearerCredentials {
+    refreshToken: string;
 }
 
 export class AADCredentials {
@@ -14,13 +18,22 @@ export class AADCredentials {
 export class CredentialService {
     private storagePrefix: string = "ACRManager/Portal/";
 
-    getRegistryCredentials(reg: string): RegistryCredentials {
-        let v: any = sessionStorage.getItem(this.storagePrefix + "RegistryCredential/" + reg);
-        return v ? <RegistryCredentials>JSON.parse(v) : null;
+    getBasicCredentials(reg: string): BasicCredentials {
+        let v: any = sessionStorage.getItem(this.storagePrefix + "BasicCredential/" + reg);
+        return v ? <BasicCredentials>JSON.parse(v) : null;
     }
 
-    setRegistryCredentials(reg: string, v: RegistryCredentials): void {
-        sessionStorage.setItem(this.storagePrefix + "RegistryCredential/" + reg, JSON.stringify(v));
+    setBasicCredentials(reg: string, v: BasicCredentials): void {
+        sessionStorage.setItem(this.storagePrefix + "BasicCredential/" + reg, JSON.stringify(v));
+    }
+
+    getBearerCredentials(reg: string): BearerCredentials {
+        let v: any = sessionStorage.getItem(this.storagePrefix + "BearerCredential/" + reg);
+        return v ? <BearerCredentials>JSON.parse(v) : null;
+    }
+
+    setBearerCredentials(reg: string, v: BearerCredentials): void {
+        sessionStorage.setItem(this.storagePrefix + "BearerCredential/" + reg, JSON.stringify(v));
     }
 
     getAADCredentials(): AADCredentials {

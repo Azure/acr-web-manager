@@ -1,11 +1,12 @@
 ﻿import * as React from "react";
 import { CancelTokenSource } from "axios";
+import { browserHistory } from "react-router";
 import {
     Button,
     ButtonType
 } from "office-ui-fabric-react/lib/Button";
 
-import { RegistryCredentials, CredentialService } from "../services/credential";
+import { BasicCredentials, CredentialService } from "../services/credential";
 import { Docker } from "../services/docker";
 
 export interface IAuthBannerProps {
@@ -36,15 +37,52 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
     }
 
     componentWillMount(): void {
-        let credential = this.credService.getRegistryCredentials(this.props.service.registryName);
-        this.setState({
-            loggedInAs: credential != null ? credential.username : null
-        } as IAuthBannerState);
+        let basic = this.credService.getBasicCredentials(this.props.service.registryName);
+        let bearer = this.credService.getBasicCredentials(this.props.service.registryName);
 
-        if (credential != null) {
+        if (basic || bearer) {
             if (this.props.onLogin) {
                 this.props.onLogin();
             }
+
+            this.setState({
+                loggedInAs: bearer ? "Active Directory user" : basic.username
+            } as IAuthBannerState);
+        }
+        else {
+            this.cancel = this.props.service.createCancelToken();
+            this.props.service.getBearerChallenge(this.cancel.token)
+                .then(challenge => {
+                    this.cancel = null;
+
+                    if (!challenge) { // basic auth only
+                        return;
+                    }
+
+                    if (!this.credService.getAADCredentials()) { // get aad token
+                        window.location.href =
+                            "/login/oidc?redirect_to=" + encodeURIComponent(window.location.toString());
+                        return;
+                    }
+
+                    this.cancel = this.props.service.createCancelToken();
+                    // get refresh token
+                    this.props.service.acquireRefreshToken(challenge, this.cancel.token)
+                        .then(ok => {
+                            if (ok) {
+                                if (this.props.onLogin) {
+                                    this.props.onLogin();
+                                }
+
+                                this.setState({
+                                    loggedInAs: bearer ? "Active Directory user" : basic.username
+                                } as IAuthBannerState);
+                            }
+                            else {
+                                // AAD login failed, use SPN instead
+                            }
+                        }).catch(x => this.cancel = null);
+                }).catch(x => this.cancel = null);
         }
     }
 
@@ -78,7 +116,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
             loggedInAs: null
         } as IAuthBannerState);
 
-        this.credService.setRegistryCredentials(this.props.service.registryName, null);
+        this.credService.setBasicCredentials(this.props.service.registryName, null);
 
         if (this.props.onLogout) {
             this.props.onLogout();
@@ -90,7 +128,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
             return;
         }
 
-        let cred: RegistryCredentials = new RegistryCredentials();
+        let cred: BasicCredentials = new BasicCredentials();
         cred.username = this.state.formUsername;
         cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
 
@@ -109,7 +147,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                         loggedInAs: cred.username
                     } as IAuthBannerState);
 
-                    this.credService.setRegistryCredentials(this.props.service.registryName, cred);
+                    this.credService.setBasicCredentials(this.props.service.registryName, cred);
 
                     if (this.props.onLogin) {
                         this.props.onLogin();

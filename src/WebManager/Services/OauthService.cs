@@ -95,8 +95,8 @@ namespace WebManager.Services
             StringBuilder queryString = new StringBuilder();
             queryString.Append("?client_id=");
             queryString.Append(_opts.ClientId);
-            queryString.Append("&resource=");
-            queryString.Append(_opts.ManagementResource);
+            // queryString.Append("&resource=");
+            // queryString.Append(_opts.ManagementResource);
             queryString.Append("&redirect_uri=");
             queryString.Append(_opts.LoginRedirectEndpoint);
             queryString.Append("&state=");
@@ -113,10 +113,7 @@ namespace WebManager.Services
         }
 
         /// <summary>
-        /// Attempts to get an authorization token using an authorization code or refresh token stored in the session data.
-        /// If a refresh token was not found, an authorization code is used.
-        /// If a token was successfully retrieved, the code and its new expiration time are stored in the session data.
-        /// This function does not refresh the session to extend its effective duration, so the calling function should handle the refresh.
+        /// Attempts to get an authorization token using an authorization code
         /// </summary>
         /// <returns>Whether an authorization token was successfully retrieved.</returns>
         public async Task<TokenRequestResponse> AcquireNewToken(string authCode)
@@ -149,7 +146,7 @@ namespace WebManager.Services
                 var token = JsonConvert.DeserializeObject<TokenRequestResponse>(await resp.Content.ReadAsStringAsync());
                 if (token.Token_Type != "Bearer" || token.Resource != _opts.ManagementResource)
                 {
-                    throw new InvalidOperationException();
+                    // throw new InvalidOperationException();
                 }
 
                 return token;

@@ -129,7 +129,7 @@ namespace WebManager.Controllers
                     {
                         StatusCode = 200,
                         ContentType = "text/html",
-                        Content = FormatCallbackHtml(model.State.Split('.')[1], token)
+                        Content = FormatCallbackHtml(model.State.Split(new[] { '.' }, 2)[1], token)
                     };
                 }
                 else

@@ -1,5 +1,6 @@
 ﻿import * as React from "react";
 import { browserHistory } from "react-router";
+import { CancelTokenSource } from "axios";
 import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcrumb";
 
 import { Docker } from "../services/docker";
@@ -7,14 +8,17 @@ import { AuthBanner } from "./auth-banner";
 import { RepositoryTagViewer } from "./repository-tag-viewer";
 
 export interface IRepositoryProps { params: any }
-interface IRepositoryState { isLoggedIn: boolean, service: Docker }
+interface IRepositoryState { isLoggedIn: boolean }
 
 export class Repository extends React.Component<IRepositoryProps, IRepositoryState> {
+    private service: Docker;
+    private cancel: CancelTokenSource;
+
     constructor(props: IRepositoryProps) {
         super(props);
+        this.service = new Docker(this.props.params.registryName);
 
         this.state = {
-            service: new Docker(this.props.params.registryName),
             isLoggedIn: false
         };
     }
@@ -37,7 +41,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                 <AuthBanner
                     onLogin={this.onLogin.bind(this)}
                     onLogout={this.onLogout.bind(this)}
-                    service={this.state.service} />
+                    service={this.service} />
                 <div id="page" className="page">
                     <Breadcrumb items={[
                         {
@@ -46,7 +50,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                             onClick: () => browserHistory.push("/")
                         },
                         {
-                            text: this.state.service.registryName,
+                            text: this.service.registryName,
                             key: "2",
                             onClick: () => browserHistory.push("/" + this.props.params.registryName)
                         },
@@ -60,7 +64,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                             null :
                             <div>
                                 <RepositoryTagViewer
-                                    service={this.state.service}
+                                    service={this.service}
                                     repositoryName={this.props.params.repositoryName}
                                     />
                             </div>

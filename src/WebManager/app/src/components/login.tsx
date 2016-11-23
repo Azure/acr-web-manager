@@ -6,7 +6,7 @@ import {
     ButtonType
 } from "office-ui-fabric-react/lib/Button";
 
-import { RegistryCredentials, CredentialService } from "../services/credential";
+import { BasicCredentials, CredentialService } from "../services/credential";
 import { Docker } from "../services/docker";
 
 import { RepositoryList } from "./repository-list";
@@ -83,7 +83,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             return;
         }
 
-        let cred: RegistryCredentials = new RegistryCredentials();
+        let cred: BasicCredentials = new BasicCredentials();
         let service: Docker = new Docker(this.extractDomain(this.state.formRegistry));
 
         cred.username = this.state.formUsername;
@@ -101,7 +101,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                 this.cancel = null;
 
                 if (success) {
-                    this.credService.setRegistryCredentials(service.registryName, cred);
+                    this.credService.setBasicCredentials(service.registryName, cred);
 
                     browserHistory.push("/" + service.registryName);
                 }
