@@ -99,6 +99,8 @@ namespace WebManager.Services
             queryString.Append(_opts.LoginRedirectEndpoint);
             queryString.Append("&state=");
             queryString.Append(SaveOauthStateCookie(context.Response, postLoginRedirect));
+            queryString.Append("&resource=");
+            queryString.Append(_opts.ManagementResource);
 
             queryString.Append("&response_type=code");
 

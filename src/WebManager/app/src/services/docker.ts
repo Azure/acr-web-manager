@@ -14,7 +14,7 @@ export class Docker {
     private registryEndpoint: string;
 
     constructor(public registryName: string) {
-        this.registryEndpoint = "http://" + this.registryName;
+        this.registryEndpoint = "https://" + this.registryName;
     }
 
     createCancelToken(): CancelTokenSource {
