@@ -85,7 +85,7 @@ namespace WebManager.Services
 
         public IActionResult Login(HttpContext context)
         {
-            string redirectUrl = string.Format(_opts.Authority, _opts.Tenant);
+            string redirectUrl = string.Format(_opts.Authority, "common");
             redirectUrl += OauthAuthorizeEndpoint;
 
             string postLoginRedirect = context.Request.Query.ContainsKey("redirect_to") ?
@@ -124,8 +124,6 @@ namespace WebManager.Services
             content.Append(_opts.ClientId);
             content.Append("&client_secret=");
             content.Append(WebUtility.HtmlEncode(_opts.ClientSecret));
-            content.Append("&tenant=");
-            content.Append(_opts.Tenant);
             content.Append("&redirect_uri=");
             content.Append(_opts.LoginRedirectEndpoint);
             content.Append("&resource=");
@@ -135,7 +133,7 @@ namespace WebManager.Services
             content.Append(authCode);
             content.Append("&grant_type=authorization_code");
 
-            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, string.Format(_opts.Authority, _opts.Tenant) + OauthTokenEndpoint);
+            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, string.Format(_opts.Authority, "common") + OauthTokenEndpoint);
             message.Content = new StringContent(content.ToString());
             message.Content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
 
