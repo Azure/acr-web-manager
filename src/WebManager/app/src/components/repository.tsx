@@ -7,14 +7,18 @@ import { AuthBanner } from "./auth-banner";
 import { RepositoryTagViewer } from "./repository-tag-viewer";
 
 export interface IRepositoryProps { params: any }
-interface IRepositoryState { isLoggedIn: boolean, service: Docker }
+interface IRepositoryState { isLoggedIn: boolean, repositoryName: string, service: Docker }
 
 export class Repository extends React.Component<IRepositoryProps, IRepositoryState> {
     constructor(props: IRepositoryProps) {
         super(props);
 
+        let name = this.props.params.repositoryName as string;
+        let namespace = this.props.params.repositoryNamespace as string;
+
         this.state = {
             service: new Docker(this.props.params.registryName),
+            repositoryName: (namespace ? `${namespace}/` : "") + name,
             isLoggedIn: false
         };
     }
@@ -61,7 +65,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                             <div>
                                 <RepositoryTagViewer
                                     service={this.state.service}
-                                    repositoryName={this.props.params.repositoryName}
+                                    repositoryName={this.state.repositoryName}
                                     />
                             </div>
                     }

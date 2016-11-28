@@ -79,15 +79,20 @@ namespace WebManager
         }
 
         [HttpGet]
-        public async Task<IActionResult> Manifest(string repo, string tag)
+        public async Task<IActionResult> Manifest2(string ns, string name, string tag)
         {
+            if (ns != null)
+            {
+                name = $"{ns}/{name}";
+            }
+
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
             }
 
-            var resp = await _service.Manifest(cred, repo, tag);
+            var resp = await _service.Manifest(cred, name, tag);
 
             if (resp == null)
             {
@@ -102,14 +107,25 @@ namespace WebManager
             };
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Manifest(string name, string tag)
+        {
+            return await Manifest2(null, name, tag);
+        }
+
         /// <summary>
         /// The client should set the following headers:
         /// Authorization: Basic
         /// Registry: (the name of the registry to access)
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> ListTags(string name)
+        public async Task<IActionResult> ListTags2(string ns, string name)
         {
+            if (ns != null)
+            {
+                name = $"{ns}/{name}";
+            }
+
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
@@ -137,6 +153,12 @@ namespace WebManager
             };
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ListTags(string name)
+        {
+            return await ListTags2(null, name);
+        }
+        
         [HttpGet]
         public async Task<IActionResult> VerifyCredential()
         {

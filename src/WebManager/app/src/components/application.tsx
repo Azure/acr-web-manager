@@ -21,6 +21,7 @@ export class Application extends React.Component<IApplicationProps, IApplication
                 <Route path="/" component={Login} />
                 <Route path=":registryName" component={Catalog} />
                 <Route path=":registryName/:repositoryName" component={Repository} />
+                <Route path=":registryName/:repositoryNamespace/:repositoryName" component={Repository} />
             </Router>
         );
     }

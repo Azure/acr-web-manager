@@ -60,12 +60,20 @@ namespace WebManager
                     new { controller = "Api", action = "Catalog" }
                 );
                 routes.MapRoute("ACRManager.API.Manifest",
-                    "v2/{repo}/manifests/{tag}",
+                    "v2/{name}/manifests/{tag}",
                     new { controller = "Api", action = "Manifest" }
                 );
                 routes.MapRoute("ACRManager.API.ListTags",
                     "v2/{name}/tags/list",
                     new { controller = "Api", action = "ListTags" }
+                );
+                routes.MapRoute("ACRManager.API.Manifest2",
+                    "v2/{ns}/{name}/manifests/{tag}",
+                    new { controller = "Api", action = "Manifest2" }
+                );
+                routes.MapRoute("ACRManager.API.ListTags2",
+                    "v2/{ns}/{name}/tags/list",
+                    new { controller = "Api", action = "ListTags2" }
                 );
                 routes.MapRoute("ACRManager.API.VerifyCredential",
                     "v2/",
@@ -82,6 +90,10 @@ namespace WebManager
                 );
                 routes.MapRoute("default2",
                     "{a}/{b}",
+                    new { controller = "App", action = "Index" }
+                );
+                routes.MapRoute("default3",
+                    "{a}/{b}/{c}",
                     new { controller = "App", action = "Index" }
                 );
             });
