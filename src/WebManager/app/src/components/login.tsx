@@ -87,7 +87,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
         let service: Docker = new Docker(this.extractDomain(this.state.formRegistry));
 
         cred.username = this.state.formUsername;
-        cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
+        cred.basicAuth = btoa("composetest:P==L//y==5=T/=7DP/4F/RYdc7CSs=WY");
 
         this.setState({
             formPassword: "",
@@ -139,7 +139,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                     <div className="login-panel">
                         <div className="ms-TextField login-field">
                             <input className="ms-TextField-field" type="text"
-                                placeholder="Registry"
+                                placeholder="composetest.azurecr.io"
                                 onChange={this.onRegistryChange.bind(this)} />
                         </div>
                         <div className="ms-TextField login-field">

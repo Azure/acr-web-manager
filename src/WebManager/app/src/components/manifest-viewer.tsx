@@ -1,6 +1,8 @@
 ﻿import * as React from "react";
 import { Docker } from "../services/docker";
 
+
+
 export interface IManifestViewerProps {
     manifest: any
 }
@@ -104,22 +106,31 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
         }
 
         let el = (
-            <div className="ms-Grid ms-font-m">
-                {props.map(x => (
-                    <div className="ms-Grid-row manifest-entry" key={x.key}>
-                        <div className="ms-Grid-col ms-u-sm2">
-                            <span>{x.key}</span>
-                        </div>
-                        <div className="ms-Grid-col ms-u-sm10">
-                            {x.value}
-                        </div>
+           
+                <div>
+                    <div className="ms-Grid ms-font-m">
+                        {props.map(x => (
+                            <div className="ms-Grid-row manifest-entry" key={x.key}>
+                                <div className="ms-Grid-col ms-u-sm2">
+                                    <span>{x.key}</span>
+                                </div>
+                                <div className="ms-Grid-col ms-u-sm10">
+                                    {x.value}
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                
+                </div>
+            
+         
+
+
         );
 
         return el;
     }
+
 
     render(): JSX.Element {
         return this.renderObject(this.props.manifest);

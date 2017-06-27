@@ -5,7 +5,10 @@ import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcru
 import { Docker } from "../services/docker";
 import { AuthBanner } from "./auth-banner";
 import { RepositoryTagViewer } from "./repository-tag-viewer";
-
+import {
+    Button,
+    ButtonType
+} from "office-ui-fabric-react/lib/Button";
 export interface IRepositoryProps { params: any }
 interface IRepositoryState { isLoggedIn: boolean, service: Docker }
 
@@ -38,6 +41,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                     onLogin={this.onLogin.bind(this)}
                     onLogout={this.onLogout.bind(this)}
                     service={this.state.service} />
+                
                 <div id="page" className="page">
                     <Breadcrumb items={[
                         {
@@ -62,11 +66,24 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                                 <RepositoryTagViewer
                                     service={this.state.service}
                                     repositoryName={this.props.params.repositoryName}
-                                    />
+                                />
                             </div>
                     }
+                    <div className="multi-button">
+                        <Button disabled={false}
+                            buttonType={ButtonType.primary}
+                            onClick={this.multiArch.bind(this)}>
+                            MultiArch
+                                        </Button>
+                    </div>
+              
                 </div>
+             
             </div>
         );
+    }
+
+    multiArch(): void {
+        browserHistory.push(`/${this.props.params.registryName}/${this.props.params.repositoryName}/multiarch`);
     }
 }
