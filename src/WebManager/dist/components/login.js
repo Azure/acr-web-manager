@@ -73,7 +73,7 @@ var Login = (function (_super) {
         var cred = new credential_1.RegistryCredentials();
         var service = new docker_1.Docker(this.extractDomain(this.state.formRegistry));
         cred.username = this.state.formUsername;
-        cred.basicAuth = btoa("composetest:P==L//y==5=T/=7DP/4F/RYdc7CSs=WY");
+        cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
         this.setState({
             formPassword: "",
             formMessage: "",
@@ -109,7 +109,7 @@ var Login = (function (_super) {
                     React.createElement("span", { className: "ms-font-xxl ms-fontColor-themeDarker" }, "Log in to Azure Container Registry Web Portal")),
                 React.createElement("div", { className: "login-panel" },
                     React.createElement("div", { className: "ms-TextField login-field" },
-                        React.createElement("input", { className: "ms-TextField-field", type: "text", placeholder: "composetest.azurecr.io", onChange: this.onRegistryChange.bind(this) })),
+                        React.createElement("input", { className: "ms-TextField-field", type: "text", placeholder: "Registry", onChange: this.onRegistryChange.bind(this) })),
                     React.createElement("div", { className: "ms-TextField login-field" },
                         React.createElement("input", { className: "ms-TextField-field", type: "text", placeholder: "Username", onChange: this.onUsernameChange.bind(this) })),
                     React.createElement("div", { className: "ms-TextField login-field" },
