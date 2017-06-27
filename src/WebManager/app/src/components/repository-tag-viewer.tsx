@@ -76,7 +76,6 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
     render(): JSX.Element {
         return (
             <div>
-          
                 <div className="ms-Grid">
                     {
                         this.state.tagsLoadError ?
@@ -86,6 +85,7 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
                             :
                             <div className="ms-Grid-row">
                                 <div className="tag-viewer-list ms-Grid-col ms-u-sm3">
+                  
                                     <RepositoryTagList
                                         service={this.props.service}
                                         repositoryName={this.props.repositoryName}

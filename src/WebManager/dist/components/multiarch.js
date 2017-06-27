@@ -15,8 +15,7 @@ var docker_1 = require("../services/docker");
 var auth_banner_1 = require("./auth-banner");
 var Breadcrumb_1 = require("office-ui-fabric-react/lib/Breadcrumb");
 var react_router_1 = require("react-router");
-var checkbox_1 = require("./checkbox");
-var Button_1 = require("office-ui-fabric-react/lib/Button");
+var multi_tag_viewer_1 = require("./multi-tag-viewer");
 var MultiArch = (function (_super) {
     __extends(MultiArch, _super);
     function MultiArch(props) {
@@ -24,7 +23,6 @@ var MultiArch = (function (_super) {
         _this.state = {
             service: new docker_1.Docker(_this.props.params.registryName),
             isLoggedIn: false,
-            optionsChecked: [],
         };
         return _this;
     }
@@ -38,34 +36,11 @@ var MultiArch = (function (_super) {
             isLoggedIn: true
         });
     };
-    MultiArch.prototype.changeEvent = function (event) {
-        var checkedArray = this.state.optionsChecked;
-        var selectedValue = event.target.value;
-        if (event.target.checked === true) {
-            checkedArray.push(selectedValue);
-            this.setState({
-                optionsChecked: checkedArray
-            });
-        }
-        else {
-            var valueIndex = checkedArray.indexOf(selectedValue);
-            checkedArray.splice(valueIndex, 1);
-            this.setState({
-                optionsChecked: checkedArray
-            });
-        }
-    };
-    MultiArch.prototype.makeManifest = function () {
-    };
     MultiArch.prototype.render = function () {
+        //var xmlHttp = new XMLHttpRequest();
+        //xmlHttp.open("GET", "https://golang.org/", false); 
+        //xmlHttp.send(null);
         var _this = this;
-        var outputCheckBoxes = (React.createElement("div", null,
-            React.createElement("div", null,
-                React.createElement(checkbox_1.Checkbox, { value: "Linux", id: 'string_', onChange: this.changeEvent.bind(this) }),
-                React.createElement("label", null, " Linux ")),
-            React.createElement("div", null,
-                React.createElement(checkbox_1.Checkbox, { value: "Windows", id: 'string_', onChange: this.changeEvent.bind(this) }),
-                React.createElement("label", null, " Windows "))));
         return (React.createElement("div", null,
             React.createElement(auth_banner_1.AuthBanner, { onLogin: this.onLogin.bind(this), onLogout: this.onLogout.bind(this), service: this.state.service }),
             React.createElement("div", { id: "page", className: "page" },
@@ -81,17 +56,19 @@ var MultiArch = (function (_super) {
                             onClick: function () { return react_router_1.browserHistory.push("/" + _this.props.params.registryName); }
                         },
                         {
-                            text: this.props.params.repositoryName + " MultiArch",
-                            key: "3"
+                            text: this.props.params.repositoryName,
+                            key: "3",
+                            onClick: function () { return react_router_1.browserHistory.push("/" + _this.props.params.registryName + "/" + _this.props.params.repositoryName); }
+                        },
+                        {
+                            text: "MultiArch",
+                            key: "4"
                         }
                     ], className: "breadcrumb" }),
                 !this.state.isLoggedIn ?
                     null :
                     React.createElement("div", null,
-                        React.createElement("div", null, outputCheckBoxes),
-                        React.createElement("div", null, JSON.stringify(this.state.optionsChecked)),
-                        React.createElement("div", { className: "multi-button" },
-                            React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.makeManifest.bind(this) }, "Make Manifest"))))));
+                        React.createElement(multi_tag_viewer_1.MultiTagViewer, { service: this.state.service, repositoryName: this.props.params.repositoryName })))));
     };
     return MultiArch;
 }(React.Component));
