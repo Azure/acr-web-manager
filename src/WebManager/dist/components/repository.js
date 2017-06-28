@@ -16,7 +16,6 @@ var Breadcrumb_1 = require("office-ui-fabric-react/lib/Breadcrumb");
 var docker_1 = require("../services/docker");
 var auth_banner_1 = require("./auth-banner");
 var repository_tag_viewer_1 = require("./repository-tag-viewer");
-var Button_1 = require("office-ui-fabric-react/lib/Button");
 var Repository = (function (_super) {
     __extends(Repository, _super);
     function Repository(props) {
@@ -61,12 +60,7 @@ var Repository = (function (_super) {
                 !this.state.isLoggedIn ?
                     null :
                     React.createElement("div", null,
-                        React.createElement(repository_tag_viewer_1.RepositoryTagViewer, { service: this.state.service, repositoryName: this.props.params.repositoryName })),
-                React.createElement("div", { className: "multi-button" },
-                    React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.multiArch.bind(this) }, "MultiArch")))));
-    };
-    Repository.prototype.multiArch = function () {
-        react_router_1.browserHistory.push("/" + this.props.params.registryName + "/" + this.props.params.repositoryName + "/multiarch");
+                        React.createElement(repository_tag_viewer_1.RepositoryTagViewer, { service: this.state.service, repositoryName: this.props.params.repositoryName, params: this.props.params })))));
     };
     return Repository;
 }(React.Component));

@@ -13,6 +13,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var repository_tag_list_1 = require("./repository-tag-list");
 var manifest_viewer_1 = require("./manifest-viewer");
+var Button_1 = require("office-ui-fabric-react/lib/Button");
+var react_router_1 = require("react-router");
 var RepositoryTagViewer = (function (_super) {
     __extends(RepositoryTagViewer, _super);
     function RepositoryTagViewer(props) {
@@ -70,7 +72,9 @@ var RepositoryTagViewer = (function (_super) {
                 :
                     React.createElement("div", { className: "ms-Grid-row" },
                         React.createElement("div", { className: "tag-viewer-list ms-Grid-col ms-u-sm3" },
-                            React.createElement(repository_tag_list_1.RepositoryTagList, { service: this.props.service, repositoryName: this.props.repositoryName, onTagClick: this.onTagSelected.bind(this), onLoadFailure: this.onLoadFailure.bind(this) })),
+                            React.createElement(repository_tag_list_1.RepositoryTagList, { service: this.props.service, repositoryName: this.props.repositoryName, onTagClick: this.onTagSelected.bind(this), onLoadFailure: this.onLoadFailure.bind(this) }),
+                            React.createElement("br", null),
+                            React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.multiArch.bind(this) }, "MultiArch")),
                         React.createElement("div", { className: "tag-viewer-panel ms-Grid-col ms-u-sm9" },
                             this.state.manifest == null ?
                                 null
@@ -89,6 +93,9 @@ var RepositoryTagViewer = (function (_super) {
                                                 this.state.manifestError.stack
                                             :
                                                 JSON.stringify(this.state.manifestError, null, 4)))))));
+    };
+    RepositoryTagViewer.prototype.multiArch = function () {
+        react_router_1.browserHistory.push("/" + this.props.params.registryName + "/" + this.props.params.repositoryName + "/multiarch");
     };
     return RepositoryTagViewer;
 }(React.Component));

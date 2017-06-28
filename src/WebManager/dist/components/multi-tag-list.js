@@ -92,7 +92,73 @@ var MultiTagList = (function (_super) {
         });
     };
     MultiTagList.prototype.makeManifest = function () {
-        alert("The tags you selected are: \n" + this.state.optionsChecked);
+        for (var i = 0; i < this.state.optionsChecked.length; i++)
+            this.getDigestAndSize(i);
+    };
+    MultiTagList.prototype.getDigestAndSize = function (tag) {
+        var _this = this;
+        this.cancel = this.props.service.createCancelToken();
+        var name = this.state.optionsChecked[tag];
+        this.props.service.getManifest2(this.props.repositoryName, name, this.cancel.token)
+            .then(function (value) {
+            _this.cancel = null;
+            if (!value)
+                return null;
+            alert(name + ";" + _this.process(value));
+        });
+    };
+    MultiTagList.prototype.process = function (value) {
+        if (typeof (value) === "string") {
+            try {
+                value = JSON.parse(value);
+            }
+            catch (err) { }
+        }
+        if (typeof (value) === "number" ||
+            typeof (value) === "string" ||
+            typeof (value) === "boolean") {
+            return this.renderPrimitive(value);
+        }
+        else if (Array.isArray(value)) {
+            return this.renderArray(value);
+        }
+        else {
+            return this.renderObject(value);
+        }
+    };
+    MultiTagList.prototype.renderObject = function (value) {
+        var cad = "";
+        for (var key in value) {
+            if (value.hasOwnProperty(key)) {
+                if (key == "v1Compatibility") {
+                    cad += key + ":" + this.renderJson(value[key]) + "\n";
+                }
+                else {
+                    if (key == "manifest") {
+                        cad += this.process(value[key]);
+                    }
+                    else {
+                        if (key == "content-length" || key == "docker-content-digest") {
+                            cad += key + ":" + this.process(value[key]) + ";";
+                        }
+                    }
+                }
+            }
+        }
+        return cad;
+    };
+    MultiTagList.prototype.renderJson = function (value) {
+        return JSON.stringify(JSON.parse(value), null, 4);
+    };
+    MultiTagList.prototype.renderArray = function (value) {
+        var cad = "";
+        for (var x in value) {
+            cad += this.process(x) + " ";
+        }
+        return cad;
+    };
+    MultiTagList.prototype.renderPrimitive = function (value) {
+        return value.toString();
     };
     MultiTagList.prototype.render = function () {
         if (this.state.tags == null) {
@@ -100,7 +166,7 @@ var MultiTagList = (function (_super) {
         }
         var outputCheckboxes = this.state.tags.map(function (string, i) {
             return (React.createElement("div", null,
-                React.createElement(checkbox_1.Checkbox, { value: string, id: 'string_' + i, onChange: this.changeEvent.bind(this) }),
+                React.createElement(checkbox_1.Checkbox, { value: string, key: string + i, id: 'string_' + i, onChange: this.changeEvent.bind(this) }),
                 React.createElement("label", { htmlFor: 'string_' + i }, string)));
         }, this);
         return (React.createElement("div", null, this.state.tags == null ?
@@ -109,6 +175,7 @@ var MultiTagList = (function (_super) {
                 (React.createElement("div", null,
                     React.createElement("div", null, outputCheckboxes),
                     React.createElement("div", { className: "multi-button" },
+                        React.createElement("br", null),
                         React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.makeManifest.bind(this) }, "Make Manifest"))))));
     };
     return MultiTagList;

@@ -66,16 +66,11 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                                 <RepositoryTagViewer
                                     service={this.state.service}
                                     repositoryName={this.props.params.repositoryName}
+                                    params={this.props.params}
                                 />
                             </div>
                     }
-                    <div className="multi-button">
-                        <Button disabled={false}
-                            buttonType={ButtonType.primary}
-                            onClick={this.multiArch.bind(this)}>
-                            MultiArch
-                                        </Button>
-                    </div>
+                    
               
                 </div>
              
@@ -83,7 +78,5 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
         );
     }
 
-    multiArch(): void {
-        browserHistory.push(`/${this.props.params.registryName}/${this.props.params.repositoryName}/multiarch`);
-    }
+
 }

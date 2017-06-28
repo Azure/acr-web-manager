@@ -12,6 +12,7 @@ import { browserHistory } from "react-router";
 export interface IRepositoryTagViewerProps {
     repositoryName: string,
     service: Docker
+    params: any
 }
 interface IRepositoryTagViewerState {
     manifest: any,
@@ -74,6 +75,7 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
     }
 
     render(): JSX.Element {
+  
         return (
             <div>
                 <div className="ms-Grid">
@@ -91,7 +93,15 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
                                         repositoryName={this.props.repositoryName}
                                         onTagClick={this.onTagSelected.bind(this)}
                                         onLoadFailure={this.onLoadFailure.bind(this)} />
+                                    <br/>
+                                    <Button disabled={false}
+                                        buttonType={ButtonType.primary}
+                                        onClick={this.multiArch.bind(this)}>
+                                        MultiArch
+                                        </Button>
                                 </div>
+                                    
+                                
                                 <div className="tag-viewer-panel ms-Grid-col ms-u-sm9">
                                     {
                                         this.state.manifest == null ?
@@ -128,6 +138,8 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
         );
     }
 
-
+    multiArch(): void {
+        browserHistory.push(`/${this.props.params.registryName}/${this.props.params.repositoryName}/multiarch`);
+    }
  
 }

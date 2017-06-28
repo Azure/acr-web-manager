@@ -87,13 +87,15 @@ namespace WebManager
                 return new UnauthorizedResult();
             }
 
-            var resp = await _service.Manifest(cred, repo, tag);
+            var resp = await _service.ManifestHeaders(cred, repo, tag);
 
             if (resp == null)
             {
                 return new UnauthorizedResult();
             }
-
+        
+            Response.Headers.Add("Docker-Content-Digest", resp.Item3);
+            Response.Headers.Add("Content-Length", resp.Item1.Length + "");
             return new ContentResult()
             {
                 Content = resp.Item1,

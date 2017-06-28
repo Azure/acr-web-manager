@@ -41,6 +41,7 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
             catch (err) { }
         }
 
+
         if (typeof (value) === "number" ||
             typeof (value) === "string" ||
             typeof (value) === "boolean") {
@@ -93,7 +94,7 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
 
     renderObject(value: any): JSX.Element {
         let props: { key: string, value: JSX.Element }[] = [];
-
+        
         for (let key in value) {
             if (value.hasOwnProperty(key)) {
                 if (key == "v1Compatibility") {
@@ -103,6 +104,7 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
                     props.push({ key: key, value: this.renderValue(value[key]) });
                 }
             }
+            
         }
 
         let el = (

@@ -56,6 +56,45 @@ export class Docker {
             });
     }
 
+
+    getManifest2(repo: string, tag: string, cancel: CancelToken = null):
+        Promise<{ manifest: string }> {
+        let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
+        if (!cred) {
+            return Promise.resolve({ manifest: null });
+        }
+
+        let config: AxiosRequestConfig = {
+            cancelToken: cancel,
+            baseURL: this.registryEndpoint,
+            params: {},
+            headers: {
+                "Registry": this.registryName,
+                "Access-Control-Expose-Headers": "X-Ms-Request-Id",
+                "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
+                "application/vnd.docker.distribution.manifest.v1+json; 0.5",
+                "Authorization": "Basic " + cred.basicAuth
+            }
+        };
+
+        return axios.get(`/v2/${repo}/manifests/${tag}`, config)
+            .then((r: AxiosResponse) => {
+
+
+
+                return { manifest: r.headers }
+            }).catch((e: any) => {
+                if (axios.isCancel(e)) {
+                    return null;
+                }
+                else {
+                    console.log(e.message);
+                    return Promise.reject(e);
+                }
+            });
+    }
+ 
+
     getManifest(repo: string, tag: string, cancel: CancelToken = null):
         Promise<{ manifest: string }> {
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
@@ -77,6 +116,9 @@ export class Docker {
 
         return axios.get(`/v2/${repo}/manifests/${tag}`, config)
             .then((r: AxiosResponse) => {
+               
+
+                
                 return { manifest: r.data }
             }).catch((e: any) => {
                 if (axios.isCancel(e)) {
@@ -106,15 +148,16 @@ export class Docker {
                 "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
+            
         };
-
+        
         if (maxResults != null) {
             config.params.n = maxResults;
         }
         if (last != null) {
             config.params.last = last;
         }
-
+        console.log(axios.get(`/v2/${repo}/tags/list`, config))
         return axios.get(`/v2/${repo}/tags/list`, config)
             .then((r: AxiosResponse) => {
                 if (r.data.tags === undefined) {

@@ -51,6 +51,37 @@ var Docker = (function () {
             }
         });
     };
+    Docker.prototype.getManifest2 = function (repo, tag, cancel) {
+        if (cancel === void 0) { cancel = null; }
+        var cred = this.credService.getRegistryCredentials(this.registryName);
+        if (!cred) {
+            return es6_promise_1.Promise.resolve({ manifest: null });
+        }
+        var config = {
+            cancelToken: cancel,
+            baseURL: this.registryEndpoint,
+            params: {},
+            headers: {
+                "Registry": this.registryName,
+                "Access-Control-Expose-Headers": "X-Ms-Request-Id",
+                "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
+                    "application/vnd.docker.distribution.manifest.v1+json; 0.5",
+                "Authorization": "Basic " + cred.basicAuth
+            }
+        };
+        return axios_1.default.get("/v2/" + repo + "/manifests/" + tag, config)
+            .then(function (r) {
+            return { manifest: r.headers };
+        }).catch(function (e) {
+            if (axios_1.default.isCancel(e)) {
+                return null;
+            }
+            else {
+                console.log(e.message);
+                return es6_promise_1.Promise.reject(e);
+            }
+        });
+    };
     Docker.prototype.getManifest = function (repo, tag, cancel) {
         if (cancel === void 0) { cancel = null; }
         var cred = this.credService.getRegistryCredentials(this.registryName);
@@ -106,6 +137,7 @@ var Docker = (function () {
         if (last != null) {
             config.params.last = last;
         }
+        console.log(axios_1.default.get("/v2/" + repo + "/tags/list", config));
         return axios_1.default.get("/v2/" + repo + "/tags/list", config)
             .then(function (r) {
             if (r.data.tags === undefined) {

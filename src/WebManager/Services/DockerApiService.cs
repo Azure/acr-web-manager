@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -118,7 +119,7 @@ namespace WebManager.Services
                     "application/vnd.docker.distribution.manifest.v1+json", 0.5));
                 message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(
                     "application/vnd.docker.distribution.manifest.v2+json", 0.6));
-
+                
                 var resp = await client.SendAsync(message);
 
                 if (resp.StatusCode == HttpStatusCode.Unauthorized)
@@ -127,6 +128,39 @@ namespace WebManager.Services
                 }
 
                 return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode);
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
+
+
+        public async Task<Tuple<string, HttpStatusCode,string>> ManifestHeaders(RegistryCredential cred, string repo, string tag)
+        {
+            try
+            {
+                HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get,
+                    new Uri(new Uri("https://" + cred.Registry), $"/v2/{repo}/manifests/{tag}"));
+
+                message.Headers.Authorization = new AuthenticationHeaderValue("Basic", cred.BasicAuth);
+                message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(
+                    "application/vnd.docker.distribution.manifest.v1+json", 0.5));
+                message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(
+                    "application/vnd.docker.distribution.manifest.v2+json", 0.6));
+
+                var resp = await client.SendAsync(message);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    return null;
+                }
+               
+                IEnumerable<string> res = resp.Headers.GetValues("Docker-Content-Digest");
+                string ans = res.ToArray()[0];
+                //var ans = resp.Headers.GetValues("Content-Size");
+                //string res = ans.ToString();
+                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode,ans);
             }
             catch (HttpRequestException)
             {
