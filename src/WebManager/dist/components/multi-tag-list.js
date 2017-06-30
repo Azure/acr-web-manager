@@ -12,6 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var checkbox_1 = require("./checkbox");
+var multimanifest_1 = require("./multimanifest");
 var Button_1 = require("office-ui-fabric-react/lib/Button");
 var MultiTagList = (function (_super) {
     __extends(MultiTagList, _super);
@@ -22,7 +23,8 @@ var MultiTagList = (function (_super) {
             tags: null,
             hasMoreTags: true,
             error: null,
-            optionsChecked: []
+            optionsChecked: [],
+            multiManifestTags: []
         };
         return _this;
     }
@@ -91,10 +93,6 @@ var MultiTagList = (function (_super) {
             }
         });
     };
-    MultiTagList.prototype.makeManifest = function () {
-        for (var i = 0; i < this.state.optionsChecked.length; i++)
-            this.getDigestAndSize(i);
-    };
     MultiTagList.prototype.getDigestAndSize = function (tag) {
         var _this = this;
         this.cancel = this.props.service.createCancelToken();
@@ -103,9 +101,27 @@ var MultiTagList = (function (_super) {
             .then(function (value) {
             _this.cancel = null;
             if (!value)
-                return null;
-            alert(name + ";" + _this.process(value));
+                return;
+            _this.setState(function (prevState, props) {
+                if (prevState.multiManifestTags == null) {
+                    prevState.multiManifestTags = [];
+                }
+                prevState.multiManifestTags.push("tag:" + name + ";" + _this.process(value));
+                return prevState;
+            });
+        }).catch(function (err) {
+            _this.cancel = null;
+            if (_this.props.onLoadFailure) {
+                _this.props.onLoadFailure(err);
+            }
         });
+    };
+    MultiTagList.prototype.makeManifest = function () {
+        this.setState({
+            multiManifestTags: []
+        });
+        for (var i = 0; i < this.state.optionsChecked.length; i++)
+            this.getDigestAndSize(i);
     };
     MultiTagList.prototype.process = function (value) {
         if (typeof (value) === "string") {
@@ -169,14 +185,20 @@ var MultiTagList = (function (_super) {
                 React.createElement(checkbox_1.Checkbox, { value: string, key: string + i, id: 'string_' + i, onChange: this.changeEvent.bind(this) }),
                 React.createElement("label", { htmlFor: 'string_' + i }, string)));
         }, this);
-        return (React.createElement("div", null, this.state.tags == null ?
-            null
-            :
-                (React.createElement("div", null,
-                    React.createElement("div", null, outputCheckboxes),
-                    React.createElement("div", { className: "multi-button" },
-                        React.createElement("br", null),
-                        React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.makeManifest.bind(this) }, "Make Manifest"))))));
+        return (React.createElement("div", null,
+            React.createElement("div", { className: "ms-Grid" }, this.state.tags == null ?
+                null
+                :
+                    React.createElement("div", { className: "ms-Grid-row" },
+                        React.createElement("div", { className: "tag-viewer-list ms-Grid-col ms-u-sm3" },
+                            outputCheckboxes,
+                            React.createElement("br", null),
+                            React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.makeManifest.bind(this) }, "MultiArch")),
+                        React.createElement("div", { className: "tag-viewer-panel ms-Grid-col ms-u-sm9" }, this.state.multiManifestTags == null || this.state.multiManifestTags.length <= 0 ?
+                            null
+                            :
+                                React.createElement("div", null,
+                                    React.createElement(multimanifest_1.MultiManifest, { digests: this.state.multiManifestTags, service: this.props.service, repositoryName: this.props.repositoryName })))))));
     };
     return MultiTagList;
 }(React.Component));

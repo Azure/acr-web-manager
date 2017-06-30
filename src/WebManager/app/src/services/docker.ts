@@ -93,6 +93,7 @@ export class Docker {
                 }
             });
     }
+
  
 
     getManifest(repo: string, tag: string, cancel: CancelToken = null):
@@ -131,6 +132,44 @@ export class Docker {
             });
     }
 
+
+    putMultiArch (repo: string, tag: string, cancel: CancelToken = null, manifest: string):
+        Promise<{ rBody: string }> {
+        let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
+        if (!cred) {
+            return Promise.resolve({ rBody: null });
+        }
+
+        let config: AxiosRequestConfig = {
+            cancelToken: cancel,
+            baseURL: this.registryEndpoint,
+            params: {},
+            headers: {
+                "Registry": this.registryName,
+                "Content-Type": "application/text",
+                "Authorization": "Basic " + cred.basicAuth
+            }
+        };
+
+        return axios.put(`/v2/${repo}/manifests/${tag}`, manifest,config)
+            .then((r: AxiosResponse) => {
+
+                alert(r.status)
+
+                return { manifest: r.data }
+            }).catch((e: any) => {
+                if (axios.isCancel(e)) {
+                    return null;
+                }
+                else {
+                    console.log(e.message);
+                    return Promise.reject(e);
+                }
+            });
+    }
+    
+
+    
     // for whatever reason, the docker registry doesn't respect the tag pagination API...
     // this will just return all the tags at once
     getTagsForRepo(repo: string, maxResults: number | null = 10, last: string = null, cancel: CancelToken = null):

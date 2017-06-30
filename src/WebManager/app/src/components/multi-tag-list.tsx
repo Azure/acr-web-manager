@@ -2,7 +2,7 @@
 import { CancelTokenSource } from "axios";
 import { Docker } from "../services/docker";
 import { Checkbox } from "./checkbox"
-
+import { MultiManifest } from "./multimanifest"
 import {
     Button,
     ButtonType
@@ -19,6 +19,7 @@ interface IMultiTagListState {
     hasMoreTags: boolean,
     error: string,
     optionsChecked: string[] 
+    multiManifestTags: string[]
 }
 
 export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTagListState > {
@@ -30,7 +31,8 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
             tags: null,
 			hasMoreTags: true,
             error: null,
-			optionsChecked: []
+            optionsChecked: [],
+            multiManifestTags: []
         }
     }
 
@@ -109,25 +111,51 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
 
             });
     }
-    makeManifest(): void {
-        for (let i: number = 0; i < this.state.optionsChecked.length;i++)
-            this.getDigestAndSize(i)
-    }
 
-    getDigestAndSize(tag: number): void{
-        
+    getDigestAndSize(tag: number): void {
+
         this.cancel = this.props.service.createCancelToken();
         var name: string = this.state.optionsChecked[tag]
         this.props.service.getManifest2(this.props.repositoryName, name, this.cancel.token)
             .then(value => {
                 this.cancel = null
-                if (!value) return null
-                alert(name +";"+this.process(value))
+                if (!value) return 
+
+                this.setState((prevState, props) => {
+                    if (prevState.multiManifestTags == null) {
+                        prevState.multiManifestTags = [];
+                    }
+                    prevState.multiManifestTags.push("tag:"+name + ";" + this.process(value));
+                    
+      
+
+                    return prevState;
+                });
+
+
+
+            
+            }).catch(err => {
+                this.cancel = null
+                if (this.props.onLoadFailure) {
+                    this.props.onLoadFailure(err);
+                }
             })
 
 
+    }
+    makeManifest(): void {
+        this.setState({
+            multiManifestTags: []
+        } as IMultiTagListState);
+        for (let i: number = 0; i < this.state.optionsChecked.length;i++)
+            this.getDigestAndSize(i)
         
     }
+
+    
+
+
 
     process(value: any): string {
         if (typeof (value) === "string") {
@@ -213,26 +241,44 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
 
         return (
             <div>
-                {
-                    this.state.tags == null ?
-                        null
-                        :
-                        (
-							<div>
-								<div>
-									{outputCheckboxes}
-								</div>
-                                <div className="multi-button">
-									<br/>
+                      <div className="ms-Grid">
+                    {
+                        this.state.tags == null ?
+                            null
+                            :
+                            <div className="ms-Grid-row">
+                                <div className="tag-viewer-list ms-Grid-col ms-u-sm3">
+                  
+                                    {outputCheckboxes}
+                                    <br/>
                                     <Button disabled={false}
                                         buttonType={ButtonType.primary}
                                         onClick={this.makeManifest.bind(this)}>
-                                        Make Manifest
-                                        </Button>
+                                        MultiArch
+                                    </Button>
+                                </div>
+                                    
+                                
+                                <div className="tag-viewer-panel ms-Grid-col ms-u-sm9">
+                                    {
+                                        this.state.multiManifestTags == null || this.state.multiManifestTags.length<=0 ?
+                                            null
+                                            :
+                                            <div>
+                                                <MultiManifest
+                                                    digests={this.state.multiManifestTags}
+                                                    service={this.props.service}
+                                                    repositoryName={this.props.repositoryName} />
+                                                
+
+                                            </div>
+                                            
+                                    }
+                                    
                                 </div>
                             </div>
-							)
-                }                       
+                    }
+                </div>
             </div>
             )
     }

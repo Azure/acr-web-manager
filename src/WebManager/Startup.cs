@@ -55,10 +55,12 @@ namespace WebManager
 
             app.UseMvc(routes =>
             {
+               
                 routes.MapRoute("ACRManager.API.Catalog",
                     "v2/_catalog",
                     new { controller = "Api", action = "Catalog" }
                 );
+
                 routes.MapRoute("ACRManager.API.Manifest",
                     "v2/{repo}/manifests/{tag}",
                     new { controller = "Api", action = "Manifest" }

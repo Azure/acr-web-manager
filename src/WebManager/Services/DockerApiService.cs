@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using WebManager.Utility;
 
@@ -161,6 +162,30 @@ namespace WebManager.Services
                 //var ans = resp.Headers.GetValues("Content-Size");
                 //string res = ans.ToString();
                 return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode,ans);
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Tuple<string,HttpStatusCode>> PutMultiArch(RegistryCredential cred, string repo, string newTag,string manifest)
+        {
+            try
+            {
+                HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Put,
+                    new Uri(new Uri("https://" + cred.Registry), $"/v2/{repo}/manifests/{newTag}"));
+
+                message.Headers.Authorization = new AuthenticationHeaderValue("Basic", cred.BasicAuth);
+                message.Headers.Add("Content-Type", "application/vnd.docker.distribution.manifest.list.v2+json");
+                message.Content = new StringContent(manifest);
+                var resp = await client.SendAsync(message);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    return null;
+                }
+                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode);
             }
             catch (HttpRequestException)
             {

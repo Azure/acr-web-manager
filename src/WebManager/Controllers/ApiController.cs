@@ -78,6 +78,32 @@ namespace WebManager
             };
         }
 
+    
+
+        [HttpPut]
+        public async Task<IActionResult> Manifest(string repo, string tag, string body)
+        {
+            
+            RegistryCredential cred = GetDockerCredential();
+            if (cred == null)
+            {
+                return new UnauthorizedResult();
+            }
+           
+            var resp = await _service.PutMultiArch(cred, repo, tag, body.ToString());
+            if(resp == null)
+            {
+                return new UnauthorizedResult();
+            }
+
+            return new ContentResult()
+            {
+                Content = resp.Item1,
+                ContentType = "application/json",
+                StatusCode = (int)resp.Item2
+            };
+        }
+
         [HttpGet]
         public async Task<IActionResult> Manifest(string repo, string tag)
         {
