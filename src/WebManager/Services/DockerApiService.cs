@@ -173,12 +173,14 @@ namespace WebManager.Services
         {
             try
             {
+                
                 HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Put,
                     new Uri(new Uri("https://" + cred.Registry), $"/v2/{repo}/manifests/{newTag}"));
 
                 message.Headers.Authorization = new AuthenticationHeaderValue("Basic", cred.BasicAuth);
-                message.Headers.Add("Content-Type", "application/vnd.docker.distribution.manifest.list.v2+json");
-                message.Content = new StringContent(manifest);
+                
+                message.Content = new StringContent(manifest,Encoding.UTF8, "application/vnd.docker.distribution.manifest.list.v2+json");
+                
                 var resp = await client.SendAsync(message);
 
                 if (resp.StatusCode == HttpStatusCode.Unauthorized)

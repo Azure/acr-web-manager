@@ -133,20 +133,21 @@ export class Docker {
     }
 
 
-    putMultiArch (repo: string, tag: string, cancel: CancelToken = null, manifest: string):
+    putMultiArch(repo: string, tag: string, cancel: CancelToken = null, manifest: string):
         Promise<{ rBody: string }> {
+        
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ rBody: null });
         }
-
+       
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
             params: {},
             headers: {
                 "Registry": this.registryName,
-                "Content-Type": "application/text",
+                "Content-Type": "application/JSON",
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
@@ -154,7 +155,7 @@ export class Docker {
         return axios.put(`/v2/${repo}/manifests/${tag}`, manifest,config)
             .then((r: AxiosResponse) => {
 
-                alert(r.status)
+              
 
                 return { manifest: r.data }
             }).catch((e: any) => {

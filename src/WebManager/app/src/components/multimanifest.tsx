@@ -103,17 +103,27 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             </div>
         );
     }
+    escapeSpecialChars(s: string) {
+        return s.replace(/\\n/g, "\\n")
+            .replace(/\\'/g, "\\'")
+            .replace(/"/g, '\\"')
+            .replace(/\\&/g, "\\&")
+            .replace(/\\r/g, "\\r")
+            .replace(/\\t/g, "\\t")
+            .replace(/\\b/g, "\\b")
+            .replace(/\\f/g, "\\f");
+    };
 
     pushManifest(): void {
         if (this.cancel) {
             return;
         }
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.putMultiArch(this.props.repositoryName, "sfklfdjk", this.cancel.token, JSON.stringify(this.createMultiArchManifest()))
+
+        this.props.service.putMultiArch(this.props.repositoryName, "Multi-Tag", this.cancel.token, '"' + JSON.stringify(this.createMultiArchManifest()).replace(/"/g,'\\"') + '"')
             .then(value => {
                 this.cancel = null
                 if (!value) return
-                alert(value.rBody)
             })
 
         

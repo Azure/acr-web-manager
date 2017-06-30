@@ -124,13 +124,12 @@ var Docker = (function () {
             params: {},
             headers: {
                 "Registry": this.registryName,
-                "Content-Type": "application/text",
+                "Content-Type": "application/JSON",
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
         return axios_1.default.put("/v2/" + repo + "/manifests/" + tag, manifest, config)
             .then(function (r) {
-            alert(r.status);
             return { manifest: r.data };
         }).catch(function (e) {
             if (axios_1.default.isCancel(e)) {

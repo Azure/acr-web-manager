@@ -2,9 +2,15 @@
 using System.Threading.Tasks;
 using WebManager.Services;
 using WebManager.Utility;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace WebManager
+
+
 {
+  
+
     public class ApiController : Controller
     {
         private DockerApiService _service;
@@ -81,16 +87,17 @@ namespace WebManager
     
 
         [HttpPut]
-        public async Task<IActionResult> Manifest(string repo, string tag, string body)
+        public async Task<IActionResult> Manifest(string repo, string tag,  [FromBody] string manifest)
         {
-            
+
+            string json = manifest;
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
             }
            
-            var resp = await _service.PutMultiArch(cred, repo, tag, body.ToString());
+            var resp = await _service.PutMultiArch(cred, repo, tag, json);
             if(resp == null)
             {
                 return new UnauthorizedResult();

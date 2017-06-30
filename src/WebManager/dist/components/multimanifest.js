@@ -85,18 +85,28 @@ var MultiManifest = (function (_super) {
             React.createElement("br", null),
             React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.pushManifest.bind(this) }, "MultiArch")));
     };
+    MultiManifest.prototype.escapeSpecialChars = function (s) {
+        return s.replace(/\\n/g, "\\n")
+            .replace(/\\'/g, "\\'")
+            .replace(/"/g, '\\"')
+            .replace(/\\&/g, "\\&")
+            .replace(/\\r/g, "\\r")
+            .replace(/\\t/g, "\\t")
+            .replace(/\\b/g, "\\b")
+            .replace(/\\f/g, "\\f");
+    };
+    ;
     MultiManifest.prototype.pushManifest = function () {
         var _this = this;
         if (this.cancel) {
             return;
         }
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.putMultiArch(this.props.repositoryName, "sfklfdjk", this.cancel.token, JSON.stringify(this.createMultiArchManifest()))
+        this.props.service.putMultiArch(this.props.repositoryName, "Multi-Tag", this.cancel.token, '"' + JSON.stringify(this.createMultiArchManifest()).replace(/"/g, '\\"') + '"')
             .then(function (value) {
             _this.cancel = null;
             if (!value)
                 return;
-            alert(value.rBody);
         });
     };
     MultiManifest.prototype.renderObject = function (value) {
