@@ -29,28 +29,33 @@ var Platform = (function () {
 }());
 var MultiManifest = (function (_super) {
     __extends(MultiManifest, _super);
-    function MultiManifest() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
+    function MultiManifest(props) {
+        var _this = _super.call(this, props) || this;
         _this.cancel = null;
+        _this.state = {
+            targetTag: ""
+        };
         return _this;
     }
     MultiManifest.prototype.createSingleManifest = function (info) {
-        var allInfo = info.split(";", 3);
+        var allInfo = info.split(";", 4);
         var digestM, sizeM, osM, architectureM;
         digestM = "";
         sizeM = "";
         osM = "";
         architectureM = "";
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < allInfo.length; i++) {
             if (allInfo[i].split(":")[0] === "docker-content-digest") {
                 digestM = allInfo[i].split(":")[1] + ":" + allInfo[i].split(":")[2];
             }
             if (allInfo[i].split(":")[0] === "content-length") {
                 sizeM = allInfo[i].split(":")[1];
             }
-            if (allInfo[i].split(":")[0] === "tag") {
-                osM = allInfo[i].split(":")[1].split("-")[1];
-                architectureM = allInfo[i].split(":")[1].split("-")[2];
+            if (allInfo[i].split(":")[0] === "os") {
+                osM = allInfo[i].split(":")[1];
+            }
+            if (allInfo[i].split(":")[0] === "architecture") {
+                architectureM = allInfo[i].split(":")[1];
             }
         }
         var plat = {
@@ -83,7 +88,15 @@ var MultiManifest = (function (_super) {
         return (React.createElement("div", null,
             this.renderValue(this.createMultiArchManifest()),
             React.createElement("br", null),
-            React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.pushManifest.bind(this) }, "MultiArch")));
+            React.createElement("div", null,
+                React.createElement("input", { className: "ms-TextField-field", type: "text", placeholder: "Tag Name", onChange: this.onRepoChange.bind(this) }),
+                React.createElement("br", null),
+                React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.pushManifest.bind(this) }, "Upload"))));
+    };
+    MultiManifest.prototype.onRepoChange = function (e) {
+        this.setState({
+            targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+        });
     };
     MultiManifest.prototype.escapeSpecialChars = function (s) {
         return s.replace(/\\n/g, "\\n")
@@ -102,11 +115,19 @@ var MultiManifest = (function (_super) {
             return;
         }
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.putMultiArch(this.props.repositoryName, "Multi-Tag", this.cancel.token, '"' + JSON.stringify(this.createMultiArchManifest()).replace(/"/g, '\\"') + '"')
+        var manifest = this.escapeSpecialChars(JSON.stringify(this.createMultiArchManifest()));
+        var tag = this.state.targetTag;
+        if (tag === "" || tag === null) {
+            tag = "Multi-Arch";
+        }
+        this.props.service.putMultiArch(this.props.repositoryName, tag, this.cancel.token, '"' + manifest + '"')
             .then(function (value) {
             _this.cancel = null;
             if (!value)
                 return;
+            if (value.rBody == "201") {
+                alert("Manifest succesfully uploaded");
+            }
         });
     };
     MultiManifest.prototype.renderObject = function (value) {

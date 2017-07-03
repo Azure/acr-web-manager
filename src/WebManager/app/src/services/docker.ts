@@ -110,7 +110,8 @@ export class Docker {
             headers: {
                 "Registry": this.registryName,
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
-                    "application/vnd.docker.distribution.manifest.v1+json; 0.5",
+                "application/vnd.docker.distribution.manifest.v1+json; 0.5," +
+                "application/vnd.docker.distribution.manifest.list.v2+json",
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
@@ -155,9 +156,9 @@ export class Docker {
         return axios.put(`/v2/${repo}/manifests/${tag}`, manifest,config)
             .then((r: AxiosResponse) => {
 
-              
 
-                return { manifest: r.data }
+
+                return { rBody: r.status }
             }).catch((e: any) => {
                 if (axios.isCancel(e)) {
                     return null;

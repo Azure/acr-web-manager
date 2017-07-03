@@ -73,7 +73,7 @@ var Login = (function (_super) {
         var cred = new credential_1.RegistryCredentials();
         var service = new docker_1.Docker(this.extractDomain(this.state.formRegistry));
         cred.username = this.state.formUsername;
-        cred.basicAuth = btoa("composetest:P==L//y==5=T/=7DP/4F/RYdc7CSs=WY");
+        cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
         this.setState({
             formPassword: "",
             formMessage: "",

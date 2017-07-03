@@ -19,12 +19,13 @@ var MultiTagList = (function (_super) {
     function MultiTagList(props) {
         var _this = _super.call(this, props) || this;
         _this.cancel = null;
+        _this.hash = {};
         _this.state = {
             tags: null,
             hasMoreTags: true,
             error: null,
             optionsChecked: [],
-            multiManifestTags: []
+            multiManifestTags: [],
         };
         return _this;
     }
@@ -32,12 +33,15 @@ var MultiTagList = (function (_super) {
         var checkedArray = this.state.optionsChecked;
         var selectedValue = event.target.value;
         if (event.target.checked === true) {
+            if (this.followsConvention(selectedValue) && this.hash[selectedValue] != "")
+                this.hash[selectedValue] = selectedValue.split("-")[1] + "-" + selectedValue.split("-")[2];
             checkedArray.push(selectedValue);
             this.setState({
                 optionsChecked: checkedArray
             });
         }
         else {
+            this.hash[selectedValue] = "";
             var valueIndex = checkedArray.indexOf(selectedValue);
             checkedArray.splice(valueIndex, 1);
             this.setState({
@@ -93,10 +97,9 @@ var MultiTagList = (function (_super) {
             }
         });
     };
-    MultiTagList.prototype.getDigestAndSize = function (tag) {
+    MultiTagList.prototype.getDigestAndSize = function (name) {
         var _this = this;
         this.cancel = this.props.service.createCancelToken();
-        var name = this.state.optionsChecked[tag];
         this.props.service.getManifest2(this.props.repositoryName, name, this.cancel.token)
             .then(function (value) {
             _this.cancel = null;
@@ -106,7 +109,21 @@ var MultiTagList = (function (_super) {
                 if (prevState.multiManifestTags == null) {
                     prevState.multiManifestTags = [];
                 }
-                prevState.multiManifestTags.push("tag:" + name + ";" + _this.process(value));
+                var tet = _this.hash[name];
+                if (tet == undefined || tet == null || tet == "") {
+                    if (_this.followsConvention(name)) {
+                        var arch = name.split("-")[2];
+                        var opS = name.split("-")[1];
+                    }
+                    else {
+                        alert("Non valid names");
+                    }
+                }
+                else {
+                    var arch = tet.split("-")[1];
+                    var opS = tet.split("-")[0];
+                }
+                prevState.multiManifestTags.push("architecture:" + arch + ";os:" + opS + ";" + _this.process(value));
                 return prevState;
             });
         }).catch(function (err) {
@@ -116,12 +133,15 @@ var MultiTagList = (function (_super) {
             }
         });
     };
+    MultiTagList.prototype.followsConvention = function (name) {
+        return name.split("-").length == 3;
+    };
     MultiTagList.prototype.makeManifest = function () {
         this.setState({
             multiManifestTags: []
         });
         for (var i = 0; i < this.state.optionsChecked.length; i++)
-            this.getDigestAndSize(i);
+            this.getDigestAndSize(this.state.optionsChecked[i]);
     };
     MultiTagList.prototype.process = function (value) {
         if (typeof (value) === "string") {
@@ -176,6 +196,14 @@ var MultiTagList = (function (_super) {
     MultiTagList.prototype.renderPrimitive = function (value) {
         return value.toString();
     };
+    MultiTagList.prototype.changeText = function (e) {
+        if (this.followsConvention(e.target.id) && e.target.value == "") {
+            this.hash[e.target.id] = e.target.id.split("-")[1] + "-" + e.target.id.split("-")[2];
+        }
+        else {
+            this.hash[e.target.id] = e.target.value;
+        }
+    };
     MultiTagList.prototype.render = function () {
         if (this.state.tags == null) {
             return null;
@@ -185,6 +213,20 @@ var MultiTagList = (function (_super) {
                 React.createElement(checkbox_1.Checkbox, { value: string, key: string + i, id: 'string_' + i, onChange: this.changeEvent.bind(this) }),
                 React.createElement("label", { htmlFor: 'string_' + i }, string)));
         }, this);
+        var selectTags = this.state.optionsChecked.map(function (string, i) {
+            return (React.createElement("div", null,
+                string,
+                React.createElement("br", null),
+                React.createElement("input", { className: "ms-TextField-field", type: "text", id: string, placeholder: this.hash[string], onChange: this.changeText.bind(this), list: "archs" }),
+                React.createElement("datalist", { id: "archs" },
+                    React.createElement("option", { value: "windows-amd64" }),
+                    React.createElement("option", { value: "windows-386" }),
+                    React.createElement("option", { value: "linux-amd64" }),
+                    React.createElement("option", { value: "linux-386" }),
+                    React.createElement("option", { value: "linux-arm" }),
+                    React.createElement("option", { value: "linux-s390x" }),
+                    React.createElement("option", { value: "linux-ppc64le" }))));
+        }, this);
         return (React.createElement("div", null,
             React.createElement("div", { className: "ms-Grid" }, this.state.tags == null ?
                 null
@@ -192,6 +234,8 @@ var MultiTagList = (function (_super) {
                     React.createElement("div", { className: "ms-Grid-row" },
                         React.createElement("div", { className: "tag-viewer-list ms-Grid-col ms-u-sm3" },
                             outputCheckboxes,
+                            React.createElement("br", null),
+                            selectTags,
                             React.createElement("br", null),
                             React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.makeManifest.bind(this) }, "MultiArch")),
                         React.createElement("div", { className: "tag-viewer-panel ms-Grid-col ms-u-sm9" }, this.state.multiManifestTags == null || this.state.multiManifestTags.length <= 0 ?

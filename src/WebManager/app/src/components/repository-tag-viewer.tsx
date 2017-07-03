@@ -41,7 +41,6 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
             .then(value => {
                 this.cancel = null;
                 if (!value) return;
-
                 this.setState({
                     manifest: value.manifest,
                     manifestError: null

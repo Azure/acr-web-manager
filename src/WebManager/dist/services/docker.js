@@ -95,7 +95,8 @@ var Docker = (function () {
             headers: {
                 "Registry": this.registryName,
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
-                    "application/vnd.docker.distribution.manifest.v1+json; 0.5",
+                    "application/vnd.docker.distribution.manifest.v1+json; 0.5," +
+                    "application/vnd.docker.distribution.manifest.list.v2+json",
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
@@ -130,7 +131,7 @@ var Docker = (function () {
         };
         return axios_1.default.put("/v2/" + repo + "/manifests/" + tag, manifest, config)
             .then(function (r) {
-            return { manifest: r.data };
+            return { rBody: r.status };
         }).catch(function (e) {
             if (axios_1.default.isCancel(e)) {
                 return null;

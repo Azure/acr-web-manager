@@ -12,7 +12,9 @@ export interface IMultiManifestProps {
     repositoryName: string
 }
 
-interface IMultiManifestState { }
+interface IMultiManifestState {
+    targetTag: string
+}
 
 class MultiArchManifest {
     schemaVersion: number
@@ -33,17 +35,22 @@ class Platform {
 }
 export class MultiManifest extends React.Component<IMultiManifestProps, IMultiManifestState>{
     private cancel: CancelTokenSource = null;
-
+    constructor(props: IMultiManifestProps) {
+        super(props);
+        this.state = {
+            targetTag: ""
+        };
+    }
     createSingleManifest(info: string): SingleManifest {
-        var allInfo: string[] = info.split(";", 3)
+        var allInfo: string[] = info.split(";", 4)
         var digestM: string, sizeM: string, osM: string, architectureM: string
         digestM = ""
         sizeM = ""
         osM = ""
-        architectureM=""
-
-        for (let i: number = 0; i < 3; i++) {
+        architectureM = ""
+        for (let i: number = 0; i < allInfo.length; i++) {
             if (allInfo[i].split(":")[0] === "docker-content-digest") {
+                
                 digestM = allInfo[i].split(":")[1] + ":" + allInfo[i].split(":")[2]
                 
             }
@@ -51,9 +58,11 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
                 
                 sizeM = allInfo[i].split(":")[1]
             }
-            if (allInfo[i].split(":")[0] === "tag") {
-                osM = allInfo[i].split(":")[1].split("-")[1]
-                architectureM = allInfo[i].split(":")[1].split("-")[2]
+            if (allInfo[i].split(":")[0] === "os") {
+                osM = allInfo[i].split(":")[1]
+            }
+            if (allInfo[i].split(":")[0] === "architecture") {
+                architectureM = allInfo[i].split(":")[1]
             }
             
         }
@@ -94,14 +103,28 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             <div>
                 {this.renderValue(this.createMultiArchManifest())}
                 <br />
-                <Button disabled={false}
-                    buttonType={ButtonType.primary}
-                    onClick={this.pushManifest.bind(this)}>
-                    MultiArch
-                </Button>
+                <div>
+                    <input className="ms-TextField-field" type="text"
+                        placeholder="Tag Name"
+                        onChange={this.onRepoChange.bind(this)} />
+
+                    <br/>
+                    <Button disabled={false}
+                        buttonType={ButtonType.primary}
+                        onClick={this.pushManifest.bind(this)}>
+                        Upload
+                    </Button>
+                </div>
 
             </div>
         );
+    }
+
+
+    onRepoChange(e: React.FormEvent<HTMLInputElement>) {
+        this.setState({
+            targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+        } as IMultiManifestState)
     }
     escapeSpecialChars(s: string) {
         return s.replace(/\\n/g, "\\n")
@@ -119,11 +142,19 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             return;
         }
         this.cancel = this.props.service.createCancelToken();
-
-        this.props.service.putMultiArch(this.props.repositoryName, "Multi-Tag", this.cancel.token, '"' + JSON.stringify(this.createMultiArchManifest()).replace(/"/g,'\\"') + '"')
+        var manifest: string = this.escapeSpecialChars(JSON.stringify(this.createMultiArchManifest()))
+        var tag: string = this.state.targetTag
+        
+        if (tag === "" || tag === null) {
+            tag="Multi-Arch"
+        }
+        this.props.service.putMultiArch(this.props.repositoryName, tag, this.cancel.token, '"' +manifest + '"')
             .then(value => {
                 this.cancel = null
                 if (!value) return
+                if (value.rBody == "201") {
+                    alert("Manifest succesfully uploaded")
+                }
             })
 
         

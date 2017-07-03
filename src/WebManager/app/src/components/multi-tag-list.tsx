@@ -22,9 +22,11 @@ interface IMultiTagListState {
     multiManifestTags: string[]
 }
 
+
+
 export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTagListState > {
     private cancel: CancelTokenSource = null;
-
+    private hash: { [key: string]: string } = {};
     constructor(props: IMultiTagListProps) {
         super(props)
         this.state = {
@@ -32,7 +34,8 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
 			hasMoreTags: true,
             error: null,
             optionsChecked: [],
-            multiManifestTags: []
+            multiManifestTags: [],
+           
         }
     }
 
@@ -41,12 +44,15 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
         let checkedArray = this.state.optionsChecked;
         let selectedValue = event.target.value;
         if (event.target.checked === true) {
+            if (this.followsConvention(selectedValue) && this.hash[selectedValue]!="")
+                this.hash[selectedValue] = selectedValue.split("-")[1] + "-" + selectedValue.split("-")[2]
             checkedArray.push(selectedValue);
             this.setState({
                 optionsChecked: checkedArray
             } as IMultiTagListState);
 
         } else {
+            this.hash[selectedValue]=""
             let valueIndex = checkedArray.indexOf(selectedValue);
             checkedArray.splice(valueIndex, 1);
             this.setState({
@@ -112,10 +118,9 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
             });
     }
 
-    getDigestAndSize(tag: number): void {
+    getDigestAndSize(name: string): void {
 
         this.cancel = this.props.service.createCancelToken();
-        var name: string = this.state.optionsChecked[tag]
         this.props.service.getManifest2(this.props.repositoryName, name, this.cancel.token)
             .then(value => {
                 this.cancel = null
@@ -125,10 +130,24 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
                     if (prevState.multiManifestTags == null) {
                         prevState.multiManifestTags = [];
                     }
-                    prevState.multiManifestTags.push("tag:"+name + ";" + this.process(value));
-                    
-      
 
+                    var tet = this.hash[name]
+                    if (tet == undefined || tet == null || tet == "") {
+                        if (this.followsConvention(name)) {
+                            var arch = name.split("-")[2]
+                            var opS = name.split("-")[1]
+                        }
+                        else {
+                            alert("Non valid names")
+                        }
+                    }
+                    else {
+                        var arch = tet.split("-")[1]
+                        var opS = tet.split("-")[0]
+                       
+                    }
+      
+                    prevState.multiManifestTags.push("architecture:" + arch + ";os:" + opS + ";" + this.process(value));
                     return prevState;
                 });
 
@@ -144,12 +163,16 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
 
 
     }
+
+    followsConvention(name: string): boolean {
+        return name.split("-").length==3
+    }
     makeManifest(): void {
         this.setState({
             multiManifestTags: []
         } as IMultiTagListState);
-        for (let i: number = 0; i < this.state.optionsChecked.length;i++)
-            this.getDigestAndSize(i)
+        for (let i: number = 0; i < this.state.optionsChecked.length; i++)
+            this.getDigestAndSize(this.state.optionsChecked[i])
         
     }
 
@@ -229,18 +252,47 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
     }
 
 
+    changeText(e: React.FormEvent<HTMLInputElement>) {
+        
+        if (this.followsConvention(e.target.id) && e.target.value == "") {
+            this.hash[e.target.id] = e.target.id.split("-")[1]+"-"+e.target.id.split("-")[2]
+        } else {
+            this.hash[e.target.id] = e.target.value
 
-    render(): JSX.Element{
+        }
+    }
+    render(): JSX.Element {
         if (this.state.tags == null) {
             return null
         }
-       
         let outputCheckboxes = this.state.tags.map(function (string, i) {
-            return (<div><Checkbox value={string} key={string+i} id={'string_' + i} onChange={this.changeEvent.bind(this)} /><label htmlFor={'string_' + i}>{string}</label></div>)
+            return (<div><Checkbox value={string} key={string + i} id={'string_' + i} onChange={this.changeEvent.bind(this)} /><label htmlFor={'string_' + i}>{string}</label>
+            </div>)
         }, this);
+        let selectTags = this.state.optionsChecked.map(function (string, i) {
+            return (<div>
+                {string}
+                <br /><input className="ms-TextField-field" type="text"
+                    id={string}
+                    placeholder={this.hash[string]}
+                    onChange={this.changeText.bind(this)}
+                    list="archs"
+                />
+                <datalist id="archs">
+                    <option value="windows-amd64" />
+                    <option value="windows-386" />
+                    <option value="linux-amd64" />
+                    <option value="linux-386" />
+                    <option value="linux-arm" />
+                    <option value="linux-s390x" />
+                    <option value="linux-ppc64le" />
+                </datalist>
+                    </div>)
+        }, this)
 
         return (
             <div>
+             
                       <div className="ms-Grid">
                     {
                         this.state.tags == null ?
@@ -248,9 +300,10 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
                             :
                             <div className="ms-Grid-row">
                                 <div className="tag-viewer-list ms-Grid-col ms-u-sm3">
-                  
                                     {outputCheckboxes}
-                                    <br/>
+                                    <br />
+                                    {selectTags}
+                                    <br />
                                     <Button disabled={false}
                                         buttonType={ButtonType.primary}
                                         onClick={this.makeManifest.bind(this)}>

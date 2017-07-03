@@ -87,7 +87,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
         let service: Docker = new Docker(this.extractDomain(this.state.formRegistry));
 
         cred.username = this.state.formUsername;
-        cred.basicAuth = btoa("composetest:P==L//y==5=T/=7DP/4F/RYdc7CSs=WY");
+        cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
 
         this.setState({
             formPassword: "",
