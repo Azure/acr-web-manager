@@ -57,7 +57,7 @@ export class Docker {
     }
 
 
-    getManifest2(repo: string, tag: string, cancel: CancelToken = null):
+    getManifestHeaders(repo: string, tag: string, cancel: CancelToken = null):
         Promise<{ manifest: string }> {
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
@@ -111,7 +111,7 @@ export class Docker {
                 "Registry": this.registryName,
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
                 "application/vnd.docker.distribution.manifest.v1+json; 0.5," +
-                "application/vnd.docker.distribution.manifest.list.v2+json",
+                "application/vnd.docker.distribution.manifest.list.v2+json; 0.7",
                 "Authorization": "Basic " + cred.basicAuth
             }
         };

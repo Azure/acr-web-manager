@@ -14,14 +14,17 @@ var React = require("react");
 var multi_tag_list_1 = require("./multi-tag-list");
 var MultiTagViewer = (function (_super) {
     __extends(MultiTagViewer, _super);
-    function MultiTagViewer() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
+    function MultiTagViewer(props) {
+        var _this = _super.call(this, props) || this;
         _this.cancel = null;
+        _this.state = {
+            tagsLoadError: null
+        };
         return _this;
     }
     MultiTagViewer.prototype.onLoadFailure = function (err) {
         this.setState({
-            error: err
+            tagsLoadError: err
         });
     };
     MultiTagViewer.prototype.componentWillUnmount = function () {
@@ -31,8 +34,11 @@ var MultiTagViewer = (function (_super) {
         }
     };
     MultiTagViewer.prototype.render = function () {
-        return (React.createElement("div", null,
-            React.createElement(multi_tag_list_1.MultiTagList, { service: this.props.service, repositoryName: this.props.repositoryName, onLoadFailure: this.onLoadFailure.bind(this) })));
+        return (this.state.tagsLoadError ?
+            React.createElement("span", { className: "ms-font-xxl" }, this.state.tagsLoadError.toString())
+            :
+                React.createElement("div", null,
+                    React.createElement(multi_tag_list_1.MultiTagList, { service: this.props.service, repositoryName: this.props.repositoryName, params: this.props.params, onLoadFailure: this.onLoadFailure.bind(this) })));
     };
     return MultiTagViewer;
 }(React.Component));

@@ -149,7 +149,8 @@ namespace WebManager.Services
                     "application/vnd.docker.distribution.manifest.v1+json", 0.5));
                 message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(
                     "application/vnd.docker.distribution.manifest.v2+json", 0.6));
-
+                message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(
+                    "application/vnd.docker.distribution.manifest.list.v2+json", 0.7));
                 var resp = await client.SendAsync(message);
 
                 if (resp.StatusCode == HttpStatusCode.Unauthorized)

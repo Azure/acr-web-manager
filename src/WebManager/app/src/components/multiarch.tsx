@@ -5,15 +5,11 @@ import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcru
 import { browserHistory } from "react-router";
 import { RepositoryTagViewer } from "./repository-tag-viewer";
 import { CancelTokenSource } from "axios";
-import { MultiTagViewer} from "./multi-tag-viewer"
-export interface IMultiArchProps {
-    params: any
-}
+import { MultiTagViewer } from "./multi-tag-viewer";
+export interface IMultiArchProps { params: any}
 interface IMultiArchState { isLoggedIn: boolean, service: Docker}
 
 export class MultiArch extends React.Component<IMultiArchProps, IMultiArchState> {
-    
-
     constructor(props: IMultiArchProps) {
         super(props);
 
@@ -34,21 +30,7 @@ export class MultiArch extends React.Component<IMultiArchProps, IMultiArchState>
         } as IMultiArchState);
     }
 
-    
-
-
-
-
-    
-
     render(): JSX.Element {
-        //var xmlHttp = new XMLHttpRequest();
-        //xmlHttp.open("GET", "https://golang.org/", false); 
-        //xmlHttp.send(null);
-        
-              
-
-      
         return (
             <div>
                 <AuthBanner
@@ -86,14 +68,11 @@ export class MultiArch extends React.Component<IMultiArchProps, IMultiArchState>
                                 <MultiTagViewer
                                     service={this.state.service}
                                     repositoryName={this.props.params.repositoryName}
-                                />
-                                
-                                
+                                    params={this.props.params}
+                                />                                                               
                             </div>
                     }
-
-                </div>
-                   
+                </div>                   
             </div>
         );
     }

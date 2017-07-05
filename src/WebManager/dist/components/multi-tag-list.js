@@ -11,7 +11,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
-var checkbox_1 = require("./checkbox");
 var multimanifest_1 = require("./multimanifest");
 var Button_1 = require("office-ui-fabric-react/lib/Button");
 var MultiTagList = (function (_super) {
@@ -24,28 +23,29 @@ var MultiTagList = (function (_super) {
             tags: null,
             hasMoreTags: true,
             error: null,
-            optionsChecked: [],
+            checkedTags: [],
             multiManifestTags: [],
         };
         return _this;
     }
-    MultiTagList.prototype.changeEvent = function (event) {
-        var checkedArray = this.state.optionsChecked;
-        var selectedValue = event.target.value;
-        if (event.target.checked === true) {
-            if (this.followsConvention(selectedValue) && this.hash[selectedValue] != "")
-                this.hash[selectedValue] = selectedValue.split("-")[1] + "-" + selectedValue.split("-")[2];
-            checkedArray.push(selectedValue);
+    MultiTagList.prototype.changeToggle = function (e) {
+        var tempArray = this.state.checkedTags;
+        if (e.target.checked === true) {
+            if (this.followsConvention(e.target.value) && this.hash[e.target.value] != "") {
+                var aux = e.target.value.split("-");
+                this.hash[e.target.value] = aux[1] + "-" + aux[2];
+            }
+            tempArray.push(e.target.value);
             this.setState({
-                optionsChecked: checkedArray
+                checkedTags: tempArray
             });
         }
         else {
-            this.hash[selectedValue] = "";
-            var valueIndex = checkedArray.indexOf(selectedValue);
-            checkedArray.splice(valueIndex, 1);
+            this.hash[e.target.value] = "";
+            var valueIndex = tempArray.indexOf(e.target.value);
+            tempArray.splice(valueIndex, 1);
             this.setState({
-                optionsChecked: checkedArray
+                checkedTags: tempArray
             });
         }
     };
@@ -100,7 +100,7 @@ var MultiTagList = (function (_super) {
     MultiTagList.prototype.getDigestAndSize = function (name) {
         var _this = this;
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getManifest2(this.props.repositoryName, name, this.cancel.token)
+        this.props.service.getManifestHeaders(this.props.repositoryName, name, this.cancel.token)
             .then(function (value) {
             _this.cancel = null;
             if (!value)
@@ -112,16 +112,21 @@ var MultiTagList = (function (_super) {
                 var tet = _this.hash[name];
                 if (tet == undefined || tet == null || tet == "") {
                     if (_this.followsConvention(name)) {
-                        var arch = name.split("-")[2];
-                        var opS = name.split("-")[1];
+                        var aux = name.split("-");
+                        var arch = aux[2];
+                        var opS = aux[1];
                     }
                     else {
-                        alert("Non valid names");
+                        alert("Please specify the architecture and os");
                     }
                 }
                 else {
-                    var arch = tet.split("-")[1];
-                    var opS = tet.split("-")[0];
+                    var aux2 = tet.split("-");
+                    var arch = aux2[1];
+                    var opS = aux2[0];
+                    if (arch == undefined || opS == undefined) {
+                        alert("Please use the following format os-architecture");
+                    }
                 }
                 prevState.multiManifestTags.push("architecture:" + arch + ";os:" + opS + ";" + _this.process(value));
                 return prevState;
@@ -134,14 +139,14 @@ var MultiTagList = (function (_super) {
         });
     };
     MultiTagList.prototype.followsConvention = function (name) {
-        return name.split("-").length == 3;
+        return name.split("-").length >= 3;
     };
     MultiTagList.prototype.makeManifest = function () {
         this.setState({
             multiManifestTags: []
         });
-        for (var i = 0; i < this.state.optionsChecked.length; i++)
-            this.getDigestAndSize(this.state.optionsChecked[i]);
+        for (var i = 0; i < this.state.checkedTags.length; i++)
+            this.getDigestAndSize(this.state.checkedTags[i]);
     };
     MultiTagList.prototype.process = function (value) {
         if (typeof (value) === "string") {
@@ -167,7 +172,7 @@ var MultiTagList = (function (_super) {
         for (var key in value) {
             if (value.hasOwnProperty(key)) {
                 if (key == "v1Compatibility") {
-                    cad += key + ":" + this.renderJson(value[key]) + "\n";
+                    cad += key + ":" + this.renderJson(value[key]);
                 }
                 else {
                     if (key == "manifest") {
@@ -205,15 +210,16 @@ var MultiTagList = (function (_super) {
         }
     };
     MultiTagList.prototype.render = function () {
+        var _this = this;
         if (this.state.tags == null) {
             return null;
         }
-        var outputCheckboxes = this.state.tags.map(function (string, i) {
+        var checkTags = this.state.tags.map(function (tag, i) {
             return (React.createElement("div", null,
-                React.createElement(checkbox_1.Checkbox, { value: string, key: string + i, id: 'string_' + i, onChange: this.changeEvent.bind(this) }),
-                React.createElement("label", { htmlFor: 'string_' + i }, string)));
+                React.createElement("input", { type: "checkbox", value: tag, id: "" + i, key: tag, onChange: _this.changeToggle.bind(_this) }),
+                React.createElement("label", null, tag)));
         }, this);
-        var selectTags = this.state.optionsChecked.map(function (string, i) {
+        var nameTags = this.state.checkedTags.map(function (string, i) {
             return (React.createElement("div", null,
                 string,
                 React.createElement("br", null),
@@ -233,16 +239,16 @@ var MultiTagList = (function (_super) {
                 :
                     React.createElement("div", { className: "ms-Grid-row" },
                         React.createElement("div", { className: "tag-viewer-list ms-Grid-col ms-u-sm3" },
-                            outputCheckboxes,
+                            checkTags,
                             React.createElement("br", null),
-                            selectTags,
+                            nameTags,
                             React.createElement("br", null),
                             React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.makeManifest.bind(this) }, "MultiArch")),
                         React.createElement("div", { className: "tag-viewer-panel ms-Grid-col ms-u-sm9" }, this.state.multiManifestTags == null || this.state.multiManifestTags.length <= 0 ?
                             null
                             :
                                 React.createElement("div", null,
-                                    React.createElement(multimanifest_1.MultiManifest, { digests: this.state.multiManifestTags, service: this.props.service, repositoryName: this.props.repositoryName })))))));
+                                    React.createElement(multimanifest_1.MultiManifest, { digests: this.state.multiManifestTags, service: this.props.service, params: this.props.params, repositoryName: this.props.repositoryName })))))));
     };
     return MultiTagList;
 }(React.Component));

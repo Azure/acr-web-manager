@@ -2,7 +2,6 @@
 import { CancelTokenSource } from "axios";
 import { Docker } from "../services/docker";
 import { MultiTagList } from "./multi-tag-list"
-
 import {
     Button,
     ButtonType
@@ -11,23 +10,23 @@ import {
 export interface IMultiTagViewerProps {
     service: Docker,
     repositoryName: string,
+    params: any
 }
-
 interface IMultiTagViewerState {
-  
-    error: string
+    tagsLoadError: string
 }
-
-
-
-
 
 export class MultiTagViewer extends React.Component<IMultiTagViewerProps, IMultiTagViewerState>{
     private cancel: CancelTokenSource = null;
-
+    constructor(props: IMultiTagViewerProps) {
+        super(props);
+        this.state = {
+            tagsLoadError: null
+        };
+    }
     onLoadFailure(err: any) {
         this.setState({
-            error: err
+            tagsLoadError: err
         } as IMultiTagViewerState);
     }
     componentWillUnmount(): void {
@@ -37,20 +36,21 @@ export class MultiTagViewer extends React.Component<IMultiTagViewerProps, IMulti
         }
     }
 
-   
-
-
-
     render(): JSX.Element {
-        return (<div>
-            <MultiTagList
-                service={this.props.service}
-                repositoryName={this.props.repositoryName}
-                onLoadFailure={this.onLoadFailure.bind(this)}
-            />
-            </div>)
-
-
+        return (
+            this.state.tagsLoadError ?
+                <span className="ms-font-xxl">
+                    {this.state.tagsLoadError.toString()}
+                </span>
+                :
+                <div>
+                    <MultiTagList
+                        service={this.props.service}
+                        repositoryName={this.props.repositoryName}
+                        params={this.props.params}
+                        onLoadFailure={this.onLoadFailure.bind(this)}
+                    />
+                </div>);
     }
 
 }

@@ -1,15 +1,17 @@
-﻿import * as React from "react"
+﻿import * as React from "react";
 import { CancelTokenSource } from "axios";
 import {
     Button,
     ButtonType
 } from "office-ui-fabric-react/lib/Button";
 import { Docker } from "../services/docker";
+import { browserHistory } from "react-router";
 
 export interface IMultiManifestProps {
     digests: string[],
     service: Docker,
-    repositoryName: string
+    repositoryName: string,
+    params: any
 }
 
 interface IMultiManifestState {
@@ -42,59 +44,57 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
         };
     }
     createSingleManifest(info: string): SingleManifest {
-        var allInfo: string[] = info.split(";", 4)
-        var digestM: string, sizeM: string, osM: string, architectureM: string
-        digestM = ""
-        sizeM = ""
-        osM = ""
-        architectureM = ""
+        var allInfo: string[] = info.split(";", 4);
+        var digestM: string, sizeM: string, osM: string, architectureM: string;
+        digestM = "";
+        sizeM = "";
+        osM = "";
+        architectureM = "";
+        
         for (let i: number = 0; i < allInfo.length; i++) {
-            if (allInfo[i].split(":")[0] === "docker-content-digest") {
-                
-                digestM = allInfo[i].split(":")[1] + ":" + allInfo[i].split(":")[2]
-                
+            var fields: string[] = allInfo[i].split(":");
+            if (fields[0] === "docker-content-digest") {                
+                digestM = fields[1] + ":" + fields[2];                
             }
-            if (allInfo[i].split(":")[0] === "content-length") {
-                
-                sizeM = allInfo[i].split(":")[1]
+            if (fields[0] === "content-length") {                
+                sizeM = fields[1];
             }
-            if (allInfo[i].split(":")[0] === "os") {
-                osM = allInfo[i].split(":")[1]
+            if (fields[0] === "os") {
+                osM = fields[1];
             }
-            if (allInfo[i].split(":")[0] === "architecture") {
-                architectureM = allInfo[i].split(":")[1]
-            }
-            
+            if (fields[0] === "architecture") {
+                architectureM = fields[1];
+            }            
         }
 
         var plat: Platform = {
             architecture: architectureM,
-            os:osM
-        }
+            os: osM
+        };
 
         var man: SingleManifest = {
             mediaType: "application/vnd.docker.distribution.manifest.v2+json",
             size: +sizeM,
             digest: digestM,
             platform: plat
-        }
-        return man
+        };
+        return man;
     }
 
     createMultiArchManifest(): MultiArchManifest {
-        if (this.props.digests == null || this.props.digests.length <= 0) return
-        var singleManifests: SingleManifest[] = []
+        if (this.props.digests == null || this.props.digests.length <= 0) return;
+        var singleManifests: SingleManifest[] = [];
         for (let i: number = 0; i < this.props.digests.length; i++) {
-            singleManifests[i] = this.createSingleManifest(this.props.digests[i])
+            singleManifests[i] = this.createSingleManifest(this.props.digests[i]);
         }
 
         var multiMan: MultiArchManifest = {
             schemaVersion: 2,
             mediaType: "application/vnd.docker.distribution.manifest.list.v2+json",
             manifests: singleManifests
-        }
+        };
 
-        return multiMan
+        return multiMan;
     }
 
     render(): JSX.Element {
@@ -124,7 +124,7 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
     onRepoChange(e: React.FormEvent<HTMLInputElement>) {
         this.setState({
             targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
-        } as IMultiManifestState)
+        } as IMultiManifestState);
     }
     escapeSpecialChars(s: string) {
         return s.replace(/\\n/g, "\\n")
@@ -135,25 +135,26 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             .replace(/\\t/g, "\\t")
             .replace(/\\b/g, "\\b")
             .replace(/\\f/g, "\\f");
-    };
+    }
 
     pushManifest(): void {
         if (this.cancel) {
             return;
         }
         this.cancel = this.props.service.createCancelToken();
-        var manifest: string = this.escapeSpecialChars(JSON.stringify(this.createMultiArchManifest()))
-        var tag: string = this.state.targetTag
+        var manifest: string = this.escapeSpecialChars(JSON.stringify(this.createMultiArchManifest()));
+        var tag: string = this.state.targetTag;
         
         if (tag === "" || tag === null) {
-            tag="Multi-Arch"
+            tag = "Multi-Arch";
         }
-        this.props.service.putMultiArch(this.props.repositoryName, tag, this.cancel.token, '"' +manifest + '"')
+        this.props.service.putMultiArch(this.props.repositoryName, tag, this.cancel.token, '"' + manifest + '"')
             .then(value => {
-                this.cancel = null
-                if (!value) return
+                this.cancel = null;
+                if (!value) return;
                 if (value.rBody == "201") {
-                    alert("Manifest succesfully uploaded")
+                    alert("Manifest succesfully uploaded");
+                    browserHistory.push(`/${this.props.params.registryName}/${this.props.repositoryName}`);
                 }
             })
 
@@ -172,11 +173,9 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
                     props.push({ key: key, value: this.renderValue(value[key]) });
                 }
             }
-
         }
 
-        let el = (
-            
+        let el = (            
             <div>
                 <div className="ms-Grid ms-font-m">
                     {props.map(x => (
@@ -190,12 +189,7 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
                         </div>
                     ))}
                 </div>
-
             </div>
-
-
-
-
         );
 
         return el;
@@ -246,6 +240,5 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             </pre>
         );
     }
-
     
 }

@@ -12,6 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var Button_1 = require("office-ui-fabric-react/lib/Button");
+var react_router_1 = require("react-router");
 var MultiArchManifest = (function () {
     function MultiArchManifest() {
     }
@@ -45,17 +46,18 @@ var MultiManifest = (function (_super) {
         osM = "";
         architectureM = "";
         for (var i = 0; i < allInfo.length; i++) {
-            if (allInfo[i].split(":")[0] === "docker-content-digest") {
-                digestM = allInfo[i].split(":")[1] + ":" + allInfo[i].split(":")[2];
+            var fields = allInfo[i].split(":");
+            if (fields[0] === "docker-content-digest") {
+                digestM = fields[1] + ":" + fields[2];
             }
-            if (allInfo[i].split(":")[0] === "content-length") {
-                sizeM = allInfo[i].split(":")[1];
+            if (fields[0] === "content-length") {
+                sizeM = fields[1];
             }
-            if (allInfo[i].split(":")[0] === "os") {
-                osM = allInfo[i].split(":")[1];
+            if (fields[0] === "os") {
+                osM = fields[1];
             }
-            if (allInfo[i].split(":")[0] === "architecture") {
-                architectureM = allInfo[i].split(":")[1];
+            if (fields[0] === "architecture") {
+                architectureM = fields[1];
             }
         }
         var plat = {
@@ -108,7 +110,6 @@ var MultiManifest = (function (_super) {
             .replace(/\\b/g, "\\b")
             .replace(/\\f/g, "\\f");
     };
-    ;
     MultiManifest.prototype.pushManifest = function () {
         var _this = this;
         if (this.cancel) {
@@ -127,6 +128,7 @@ var MultiManifest = (function (_super) {
                 return;
             if (value.rBody == "201") {
                 alert("Manifest succesfully uploaded");
+                react_router_1.browserHistory.push("/" + _this.props.params.registryName + "/" + _this.props.repositoryName);
             }
         });
     };

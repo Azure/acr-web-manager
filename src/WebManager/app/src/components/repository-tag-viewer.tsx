@@ -11,7 +11,7 @@ import { browserHistory } from "react-router";
 
 export interface IRepositoryTagViewerProps {
     repositoryName: string,
-    service: Docker
+    service: Docker,
     params: any
 }
 interface IRepositoryTagViewerState {
@@ -74,7 +74,6 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
     }
 
     render(): JSX.Element {
-  
         return (
             <div>
                 <div className="ms-Grid">

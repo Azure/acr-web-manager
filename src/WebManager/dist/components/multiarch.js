@@ -37,9 +37,6 @@ var MultiArch = (function (_super) {
         });
     };
     MultiArch.prototype.render = function () {
-        //var xmlHttp = new XMLHttpRequest();
-        //xmlHttp.open("GET", "https://golang.org/", false); 
-        //xmlHttp.send(null);
         var _this = this;
         return (React.createElement("div", null,
             React.createElement(auth_banner_1.AuthBanner, { onLogin: this.onLogin.bind(this), onLogout: this.onLogout.bind(this), service: this.state.service }),
@@ -68,7 +65,7 @@ var MultiArch = (function (_super) {
                 !this.state.isLoggedIn ?
                     null :
                     React.createElement("div", null,
-                        React.createElement(multi_tag_viewer_1.MultiTagViewer, { service: this.state.service, repositoryName: this.props.params.repositoryName })))));
+                        React.createElement(multi_tag_viewer_1.MultiTagViewer, { service: this.state.service, repositoryName: this.props.params.repositoryName, params: this.props.params })))));
     };
     return MultiArch;
 }(React.Component));

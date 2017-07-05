@@ -51,7 +51,7 @@ var Docker = (function () {
             }
         });
     };
-    Docker.prototype.getManifest2 = function (repo, tag, cancel) {
+    Docker.prototype.getManifestHeaders = function (repo, tag, cancel) {
         if (cancel === void 0) { cancel = null; }
         var cred = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
@@ -96,7 +96,7 @@ var Docker = (function () {
                 "Registry": this.registryName,
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
                     "application/vnd.docker.distribution.manifest.v1+json; 0.5," +
-                    "application/vnd.docker.distribution.manifest.list.v2+json",
+                    "application/vnd.docker.distribution.manifest.list.v2+json; 0.7",
                 "Authorization": "Basic " + cred.basicAuth
             }
         };
