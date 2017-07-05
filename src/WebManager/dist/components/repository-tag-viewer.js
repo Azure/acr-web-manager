@@ -33,7 +33,7 @@ var RepositoryTagViewer = (function (_super) {
             this.cancel.cancel("select new tag");
         }
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getManifest(this.props.repositoryName, tag, this.cancel.token)
+        this.props.service.getManifest(this.props.params.repositoryName, tag, this.cancel.token)
             .then(function (value) {
             _this.cancel = null;
             if (!value)
@@ -72,9 +72,9 @@ var RepositoryTagViewer = (function (_super) {
                 :
                     React.createElement("div", { className: "ms-Grid-row" },
                         React.createElement("div", { className: "tag-viewer-list ms-Grid-col ms-u-sm3" },
-                            React.createElement(repository_tag_list_1.RepositoryTagList, { service: this.props.service, repositoryName: this.props.repositoryName, onTagClick: this.onTagSelected.bind(this), onLoadFailure: this.onLoadFailure.bind(this) }),
+                            React.createElement(repository_tag_list_1.RepositoryTagList, { service: this.props.service, repositoryName: this.props.params.repositoryName, onTagClick: this.onTagSelected.bind(this), onLoadFailure: this.onLoadFailure.bind(this) }),
                             React.createElement("br", null),
-                            React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.multiArch.bind(this) }, "MultiArch")),
+                            React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.multiArch.bind(this) }, "Create MultiArch")),
                         React.createElement("div", { className: "tag-viewer-panel ms-Grid-col ms-u-sm9" },
                             this.state.manifest == null ?
                                 null

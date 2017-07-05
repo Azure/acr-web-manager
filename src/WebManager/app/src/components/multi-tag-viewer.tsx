@@ -9,7 +9,6 @@ import {
 
 export interface IMultiTagViewerProps {
     service: Docker,
-    repositoryName: string,
     params: any
 }
 interface IMultiTagViewerState {
@@ -46,7 +45,6 @@ export class MultiTagViewer extends React.Component<IMultiTagViewerProps, IMulti
                 <div>
                     <MultiTagList
                         service={this.props.service}
-                        repositoryName={this.props.repositoryName}
                         params={this.props.params}
                         onLoadFailure={this.onLoadFailure.bind(this)}
                     />

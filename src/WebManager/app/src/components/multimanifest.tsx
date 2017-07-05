@@ -10,13 +10,11 @@ import { browserHistory } from "react-router";
 export interface IMultiManifestProps {
     digests: string[],
     service: Docker,
-    repositoryName: string,
-    params: any
-}
-
-interface IMultiManifestState {
+    params: any,
     targetTag: string
 }
+
+interface IMultiManifestState { }
 
 class MultiArchManifest {
     schemaVersion: number
@@ -35,6 +33,8 @@ class Platform {
     architecture: string
     os: string
 }
+
+
 export class MultiManifest extends React.Component<IMultiManifestProps, IMultiManifestState>{
     private cancel: CancelTokenSource = null;
     constructor(props: IMultiManifestProps) {
@@ -102,30 +102,17 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
         return (
             <div>
                 {this.renderValue(this.createMultiArchManifest())}
-                <br />
-                <div>
-                    <input className="ms-TextField-field" type="text"
-                        placeholder="Tag Name"
-                        onChange={this.onRepoChange.bind(this)} />
-
-                    <br/>
-                    <Button disabled={false}
-                        buttonType={ButtonType.primary}
-                        onClick={this.pushManifest.bind(this)}>
-                        Upload
-                    </Button>
-                </div>
-
+                <Button disabled={false}
+                    buttonType={ButtonType.primary}
+                    onClick={this.pushManifest.bind(this)}>
+                    Upload
+                </Button>                
             </div>
         );
     }
 
 
-    onRepoChange(e: React.FormEvent<HTMLInputElement>) {
-        this.setState({
-            targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
-        } as IMultiManifestState);
-    }
+
     escapeSpecialChars(s: string) {
         return s.replace(/\\n/g, "\\n")
             .replace(/\\'/g, "\\'")
@@ -143,18 +130,18 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
         }
         this.cancel = this.props.service.createCancelToken();
         var manifest: string = this.escapeSpecialChars(JSON.stringify(this.createMultiArchManifest()));
-        var tag: string = this.state.targetTag;
+        var tag: string = this.props.targetTag;
         
         if (tag === "" || tag === null) {
             tag = "Multi-Arch";
         }
-        this.props.service.putMultiArch(this.props.repositoryName, tag, this.cancel.token, '"' + manifest + '"')
+        this.props.service.putMultiArch(this.props.params.repositoryName, tag, this.cancel.token, '"' + manifest + '"')
             .then(value => {
                 this.cancel = null;
                 if (!value) return;
                 if (value.rBody == "201") {
                     alert("Manifest succesfully uploaded");
-                    browserHistory.push(`/${this.props.params.registryName}/${this.props.repositoryName}`);
+                    browserHistory.push(`/${this.props.params.registryName}/${this.props.params.repositoryName}`);
                 }
             })
 

@@ -9,7 +9,6 @@ import {
 
 export interface IMultiTagListProps {
     service: Docker,
-    repositoryName: string,
     params: any,
     onLoadFailure?: (err: any) => void
 }
@@ -18,8 +17,9 @@ interface IMultiTagListState {
     tags: string[],
     hasMoreTags: boolean,
     error: string,
-    checkedTags: string[] 
-    multiManifestTags: string[]
+    checkedTags: string[],
+    multiManifestTags: string[],
+    targetTag:string
 }
 
 export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTagListState > {
@@ -34,6 +34,7 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
             error: null,
             checkedTags: [],
             multiManifestTags: [],
+            targetTag: null
         };
     }
 
@@ -84,7 +85,7 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
             last = this.state.tags[this.state.tags.length - 1];
         }
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getTagsForRepo(this.props.repositoryName, 10, last, this.cancel.token)
+        this.props.service.getTagsForRepo(this.props.params.repositoryName, 10, last, this.cancel.token)
             .then(value => {
                 this.cancel = null;
                 if (!value) return;
@@ -117,7 +118,7 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
     getDigestAndSize(name: string): void {
 
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getManifestHeaders(this.props.repositoryName, name, this.cancel.token)
+        this.props.service.getManifestHeaders(this.props.params.repositoryName, name, this.cancel.token)
             .then(value => {
                 this.cancel = null;
                 if (!value) return 
@@ -244,6 +245,12 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
             this.hash[e.target.id] = e.target.value;
         }
     }
+
+    changeTag(e: React.FormEvent<HTMLInputElement>) {
+        this.setState({
+            targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+        } as IMultiTagListState);
+    }
     render(): JSX.Element {
         if (this.state.tags == null) {
             return null;
@@ -285,6 +292,14 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
                             :
                             <div className="ms-Grid-row">
                                 <div className="tag-viewer-list ms-Grid-col ms-u-sm3">
+                                    Choose a name for the multi-arch tag
+                                    <input className="ms-TextField-field" type="text"
+                                        id="NewName"
+                                        placeholder="Default Tag is Multi-Arch"
+                                        onChange={this.changeTag.bind(this)}
+                                    />
+                                    <br />
+                                    <br />
                                     {checkTags}
                                     <br />
                                     {nameTags}
@@ -305,7 +320,7 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
                                                     digests={this.state.multiManifestTags}
                                                     service={this.props.service}
                                                     params={this.props.params}
-                                                    repositoryName={this.props.repositoryName} />
+                                                    targetTag={this.state.targetTag} />
                                             </div>
                                     }
                                 </div>

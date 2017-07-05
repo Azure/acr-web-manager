@@ -89,16 +89,7 @@ var MultiManifest = (function (_super) {
     MultiManifest.prototype.render = function () {
         return (React.createElement("div", null,
             this.renderValue(this.createMultiArchManifest()),
-            React.createElement("br", null),
-            React.createElement("div", null,
-                React.createElement("input", { className: "ms-TextField-field", type: "text", placeholder: "Tag Name", onChange: this.onRepoChange.bind(this) }),
-                React.createElement("br", null),
-                React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.pushManifest.bind(this) }, "Upload"))));
-    };
-    MultiManifest.prototype.onRepoChange = function (e) {
-        this.setState({
-            targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
-        });
+            React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.pushManifest.bind(this) }, "Upload")));
     };
     MultiManifest.prototype.escapeSpecialChars = function (s) {
         return s.replace(/\\n/g, "\\n")
@@ -117,18 +108,18 @@ var MultiManifest = (function (_super) {
         }
         this.cancel = this.props.service.createCancelToken();
         var manifest = this.escapeSpecialChars(JSON.stringify(this.createMultiArchManifest()));
-        var tag = this.state.targetTag;
+        var tag = this.props.targetTag;
         if (tag === "" || tag === null) {
             tag = "Multi-Arch";
         }
-        this.props.service.putMultiArch(this.props.repositoryName, tag, this.cancel.token, '"' + manifest + '"')
+        this.props.service.putMultiArch(this.props.params.repositoryName, tag, this.cancel.token, '"' + manifest + '"')
             .then(function (value) {
             _this.cancel = null;
             if (!value)
                 return;
             if (value.rBody == "201") {
                 alert("Manifest succesfully uploaded");
-                react_router_1.browserHistory.push("/" + _this.props.params.registryName + "/" + _this.props.repositoryName);
+                react_router_1.browserHistory.push("/" + _this.props.params.registryName + "/" + _this.props.params.repositoryName);
             }
         });
     };

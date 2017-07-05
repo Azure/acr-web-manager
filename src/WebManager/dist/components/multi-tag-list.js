@@ -25,6 +25,7 @@ var MultiTagList = (function (_super) {
             error: null,
             checkedTags: [],
             multiManifestTags: [],
+            targetTag: null
         };
         return _this;
     }
@@ -71,7 +72,7 @@ var MultiTagList = (function (_super) {
             last = this.state.tags[this.state.tags.length - 1];
         }
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getTagsForRepo(this.props.repositoryName, 10, last, this.cancel.token)
+        this.props.service.getTagsForRepo(this.props.params.repositoryName, 10, last, this.cancel.token)
             .then(function (value) {
             _this.cancel = null;
             if (!value)
@@ -100,7 +101,7 @@ var MultiTagList = (function (_super) {
     MultiTagList.prototype.getDigestAndSize = function (name) {
         var _this = this;
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getManifestHeaders(this.props.repositoryName, name, this.cancel.token)
+        this.props.service.getManifestHeaders(this.props.params.repositoryName, name, this.cancel.token)
             .then(function (value) {
             _this.cancel = null;
             if (!value)
@@ -209,6 +210,11 @@ var MultiTagList = (function (_super) {
             this.hash[e.target.id] = e.target.value;
         }
     };
+    MultiTagList.prototype.changeTag = function (e) {
+        this.setState({
+            targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+        });
+    };
     MultiTagList.prototype.render = function () {
         var _this = this;
         if (this.state.tags == null) {
@@ -239,6 +245,10 @@ var MultiTagList = (function (_super) {
                 :
                     React.createElement("div", { className: "ms-Grid-row" },
                         React.createElement("div", { className: "tag-viewer-list ms-Grid-col ms-u-sm3" },
+                            "Choose a name for the multi-arch tag",
+                            React.createElement("input", { className: "ms-TextField-field", type: "text", id: "NewName", placeholder: "Default Tag is Multi-Arch", onChange: this.changeTag.bind(this) }),
+                            React.createElement("br", null),
+                            React.createElement("br", null),
                             checkTags,
                             React.createElement("br", null),
                             nameTags,
@@ -248,7 +258,7 @@ var MultiTagList = (function (_super) {
                             null
                             :
                                 React.createElement("div", null,
-                                    React.createElement(multimanifest_1.MultiManifest, { digests: this.state.multiManifestTags, service: this.props.service, params: this.props.params, repositoryName: this.props.repositoryName })))))));
+                                    React.createElement(multimanifest_1.MultiManifest, { digests: this.state.multiManifestTags, service: this.props.service, params: this.props.params, targetTag: this.state.targetTag })))))));
     };
     return MultiTagList;
 }(React.Component));

@@ -65,7 +65,6 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                             <div>
                                 <RepositoryTagViewer
                                     service={this.state.service}
-                                    repositoryName={this.props.params.repositoryName}
                                     params={this.props.params}
                                 />
                             </div>

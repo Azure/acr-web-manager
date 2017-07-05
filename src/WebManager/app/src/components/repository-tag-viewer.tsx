@@ -10,7 +10,6 @@ import {
 import { browserHistory } from "react-router";
 
 export interface IRepositoryTagViewerProps {
-    repositoryName: string,
     service: Docker,
     params: any
 }
@@ -37,7 +36,7 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
         }
         this.cancel = this.props.service.createCancelToken();
 
-        this.props.service.getManifest(this.props.repositoryName, tag, this.cancel.token)
+        this.props.service.getManifest(this.props.params.repositoryName, tag, this.cancel.token)
             .then(value => {
                 this.cancel = null;
                 if (!value) return;
@@ -88,14 +87,14 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
                   
                                     <RepositoryTagList
                                         service={this.props.service}
-                                        repositoryName={this.props.repositoryName}
+                                        repositoryName={this.props.params.repositoryName}
                                         onTagClick={this.onTagSelected.bind(this)}
                                         onLoadFailure={this.onLoadFailure.bind(this)} />
                                     <br/>
                                     <Button disabled={false}
                                         buttonType={ButtonType.primary}
                                         onClick={this.multiArch.bind(this)}>
-                                        MultiArch
+                                        Create MultiArch
                                         </Button>
                                 </div>
                                     

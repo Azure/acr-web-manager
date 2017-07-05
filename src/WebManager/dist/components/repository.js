@@ -60,7 +60,7 @@ var Repository = (function (_super) {
                 !this.state.isLoggedIn ?
                     null :
                     React.createElement("div", null,
-                        React.createElement(repository_tag_viewer_1.RepositoryTagViewer, { service: this.state.service, repositoryName: this.props.params.repositoryName, params: this.props.params })))));
+                        React.createElement(repository_tag_viewer_1.RepositoryTagViewer, { service: this.state.service, params: this.props.params })))));
     };
     return Repository;
 }(React.Component));

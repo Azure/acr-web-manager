@@ -38,7 +38,7 @@ var MultiTagViewer = (function (_super) {
             React.createElement("span", { className: "ms-font-xxl" }, this.state.tagsLoadError.toString())
             :
                 React.createElement("div", null,
-                    React.createElement(multi_tag_list_1.MultiTagList, { service: this.props.service, repositoryName: this.props.repositoryName, params: this.props.params, onLoadFailure: this.onLoadFailure.bind(this) })));
+                    React.createElement(multi_tag_list_1.MultiTagList, { service: this.props.service, params: this.props.params, onLoadFailure: this.onLoadFailure.bind(this) })));
     };
     return MultiTagViewer;
 }(React.Component));

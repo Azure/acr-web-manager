@@ -65,7 +65,7 @@ var MultiArch = (function (_super) {
                 !this.state.isLoggedIn ?
                     null :
                     React.createElement("div", null,
-                        React.createElement(multi_tag_viewer_1.MultiTagViewer, { service: this.state.service, repositoryName: this.props.params.repositoryName, params: this.props.params })))));
+                        React.createElement(multi_tag_viewer_1.MultiTagViewer, { service: this.state.service, params: this.props.params })))));
     };
     return MultiArch;
 }(React.Component));

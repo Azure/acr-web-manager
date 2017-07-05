@@ -67,7 +67,6 @@ export class MultiArch extends React.Component<IMultiArchProps, IMultiArchState>
                             <div>
                                 <MultiTagViewer
                                     service={this.state.service}
-                                    repositoryName={this.props.params.repositoryName}
                                     params={this.props.params}
                                 />                                                               
                             </div>
