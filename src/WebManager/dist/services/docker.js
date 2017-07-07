@@ -46,7 +46,6 @@ var Docker = (function () {
                 return null;
             }
             else {
-                console.log(e.message);
                 return es6_promise_1.Promise.reject(e);
             }
         });
@@ -77,7 +76,6 @@ var Docker = (function () {
                 return null;
             }
             else {
-                console.log(e.message);
                 return es6_promise_1.Promise.reject(e);
             }
         });
@@ -108,7 +106,6 @@ var Docker = (function () {
                 return null;
             }
             else {
-                console.log(e.message);
                 return es6_promise_1.Promise.reject(e);
             }
         });
@@ -137,7 +134,6 @@ var Docker = (function () {
                 return null;
             }
             else {
-                console.log(e.message);
                 return es6_promise_1.Promise.reject(e);
             }
         });
@@ -167,11 +163,9 @@ var Docker = (function () {
         if (last != null) {
             config.params.last = last;
         }
-        console.log(axios_1.default.get("/v2/" + repo + "/tags/list", config));
         return axios_1.default.get("/v2/" + repo + "/tags/list", config)
             .then(function (r) {
             if (r.data.tags === undefined) {
-                console.log(r.data.errors);
                 return null;
             }
             return { tags: r.data.tags, httpLink: r.headers.link };
@@ -180,7 +174,6 @@ var Docker = (function () {
                 return null;
             }
             else {
-                console.log(e);
                 return es6_promise_1.Promise.reject(e);
             }
         });
@@ -214,12 +207,10 @@ var Docker = (function () {
                     return false;
                 }
                 else {
-                    console.log(e);
                     return es6_promise_1.Promise.reject(e);
                 }
             }
             else {
-                console.log(e);
                 return es6_promise_1.Promise.reject(e);
             }
         });

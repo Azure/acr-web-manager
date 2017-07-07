@@ -50,7 +50,6 @@ export class Docker {
                     return null;
                 }
                 else {
-                    console.log(e.message);
                     return Promise.reject(e);
                 }
             });
@@ -84,7 +83,6 @@ export class Docker {
                     return null;
                 }
                 else {
-                    console.log(e.message);
                     return Promise.reject(e);
                 }
             });
@@ -121,7 +119,6 @@ export class Docker {
                     return null;
                 }
                 else {
-                    console.log(e.message);
                     return Promise.reject(e);
                 }
             });
@@ -154,7 +151,6 @@ export class Docker {
                     return null;
                 }
                 else {
-                    console.log(e.message);
                     return Promise.reject(e);
                 }
             });
@@ -177,7 +173,6 @@ export class Docker {
                 "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
-
         };
 
         if (maxResults != null) {
@@ -186,11 +181,9 @@ export class Docker {
         if (last != null) {
             config.params.last = last;
         }
-        console.log(axios.get(`/v2/${repo}/tags/list`, config))
         return axios.get(`/v2/${repo}/tags/list`, config)
             .then((r: AxiosResponse) => {
                 if (r.data.tags === undefined) {
-                    console.log(r.data.errors)
                     return null;
                 }
 
@@ -200,7 +193,6 @@ export class Docker {
                     return null;
                 }
                 else {
-                    console.log(e);
                     return Promise.reject(e);
                 }
             });
@@ -234,12 +226,10 @@ export class Docker {
                         return false;
                     }
                     else {
-                        console.log(e);
                         return Promise.reject(e);
                     }
                 }
                 else {
-                    console.log(e);
                     return Promise.reject(e);
                 }
             });

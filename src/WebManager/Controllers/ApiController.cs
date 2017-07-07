@@ -67,16 +67,16 @@ namespace WebManager
                 return new UnauthorizedResult();
             }
 
-            if (resp.Item3 != null)
+            if (resp != null)
             {
-                Response.Headers.Add("Link", resp.Item3);
+                Response.Headers.Add("Link", resp.aditionalInfo);
             }
 
             return new ContentResult()
             {
-                Content = resp.Item1,
+                Content = resp.content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int) resp.status
             };
         }
 
@@ -85,15 +85,13 @@ namespace WebManager
         [HttpPut]
         public async Task<IActionResult> Manifest(string repo, string tag,  [FromBody] string manifest)
         {
-
-            string json = manifest;
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
             }
            
-            var resp = await _service.PutMultiArch(cred, repo, tag, json);
+            var resp = await _service.PutMultiArch(cred, repo, tag, manifest);
             if(resp == null)
             {
                 return new UnauthorizedResult();
@@ -101,9 +99,9 @@ namespace WebManager
 
             return new ContentResult()
             {
-                Content = resp.Item1,
+                Content = resp.content,
                 ContentType = "application/json",
-                StatusCode = (int)resp.Item2
+                StatusCode = (int)resp.status
             };
         }
 
@@ -124,13 +122,13 @@ namespace WebManager
             }
             
             //These Headers are added because now any application thats needs these information can get it through an http request.
-            Response.Headers.Add("Docker-Content-Digest", resp.Item3);
-            Response.Headers.Add("Content-Length", resp.Item1.Length + "");
+            Response.Headers.Add("Docker-Content-Digest", resp.aditionalInfo);
+            Response.Headers.Add("Content-Length", resp.size + "");
             return new ContentResult()
             {
-                Content = resp.Item1,
+                Content = resp.content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int) resp.status
             };
         }
 
@@ -156,16 +154,16 @@ namespace WebManager
                 return new UnauthorizedResult();
             }
 
-            if (resp.Item3 != null)
+            if (resp.aditionalInfo != null)
             {
-                Response.Headers.Add("Link", resp.Item3);
+                Response.Headers.Add("Link", resp.aditionalInfo);
             }
 
             return new ContentResult()
             {
-                Content = resp.Item1,
+                Content = resp.content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int) resp.status
             };
         }
 

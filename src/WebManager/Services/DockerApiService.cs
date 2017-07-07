@@ -48,7 +48,7 @@ namespace WebManager.Services
         /// If authentication failed, returns null.
         /// If any other error occured, throws an exception.
         /// </summary>
-        public async Task<Tuple<string, HttpStatusCode, string>> ListTags(RegistryCredential cred, string repoName, string queryString)
+        public async Task<APIResponse> ListTags(RegistryCredential cred, string repoName, string queryString)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace WebManager.Services
                     return null;
                 }
 
-                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
                     resp.Headers.Contains("Link") ? resp.Headers.GetValues("Link").First() : null);
             }
             catch (HttpRequestException)
@@ -80,7 +80,7 @@ namespace WebManager.Services
         /// If any other error occured, throws an exception.
         /// </summary>
         /// <returns>A tuple containing the result, and the HTTP Link header.</returns>
-        public async Task<Tuple<string, HttpStatusCode, string>> Catalog(RegistryCredential cred, string queryString)
+        public async Task<APIResponse> Catalog(RegistryCredential cred, string queryString)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace WebManager.Services
                     return null;
                 }
 
-                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
                     resp.Headers.Contains("Link") ? resp.Headers.GetValues("Link").First() : null);
             }
             catch (HttpRequestException)
@@ -108,7 +108,7 @@ namespace WebManager.Services
         /// <summary>
         /// Reads a manifest.
         /// </summary>
-        public async Task<Tuple<string, HttpStatusCode,string>> Manifest(RegistryCredential cred, string repo, string tag)
+        public async Task<APIResponse> Manifest(RegistryCredential cred, string repo, string tag)
         {
             try
             {
@@ -131,9 +131,7 @@ namespace WebManager.Services
                
                 IEnumerable<string> res = resp.Headers.GetValues("Docker-Content-Digest");
                 string ans = res.ToArray()[0];
-                //var ans = resp.Headers.GetValues("Content-Size");
-                //string res = ans.ToString();
-                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode,ans);
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode,ans);
             }
             catch (HttpRequestException)
             {
@@ -141,7 +139,7 @@ namespace WebManager.Services
             }
         }
 
-        public async Task<Tuple<string,HttpStatusCode>> PutMultiArch(RegistryCredential cred, string repo, string newTag,string manifest)
+        public async Task<APIResponse> PutMultiArch(RegistryCredential cred, string repo, string newTag,string manifest)
         {
             try
             {
@@ -159,7 +157,7 @@ namespace WebManager.Services
                 {
                     return null;
                 }
-                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode);
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode);
             }
             catch (HttpRequestException)
             {

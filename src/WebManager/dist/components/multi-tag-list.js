@@ -19,6 +19,7 @@ var MultiTagList = (function (_super) {
         var _this = _super.call(this, props) || this;
         _this.cancel = null;
         _this.hash = {};
+        _this.show = false;
         _this.state = {
             tags: null,
             hasMoreTags: true,
@@ -116,6 +117,7 @@ var MultiTagList = (function (_super) {
                         var aux = name.split("-");
                         var arch = aux[2];
                         var opS = aux[1];
+                        _this.show = true;
                     }
                     else {
                         alert("Please specify the architecture and os");
@@ -214,6 +216,7 @@ var MultiTagList = (function (_super) {
         }
     };
     MultiTagList.prototype.changeTag = function (e) {
+        //Here the replace function removes all Non-US-ASCII characters
         this.setState({
             targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
         });
@@ -239,6 +242,7 @@ var MultiTagList = (function (_super) {
                     React.createElement("option", { value: "linux-amd64" }),
                     React.createElement("option", { value: "linux-386" }),
                     React.createElement("option", { value: "linux-arm" }),
+                    React.createElement("option", { value: "linux-arm64" }),
                     React.createElement("option", { value: "linux-s390x" }),
                     React.createElement("option", { value: "linux-ppc64le" }))));
         }, this);
@@ -257,7 +261,7 @@ var MultiTagList = (function (_super) {
                             nameTags,
                             React.createElement("br", null),
                             React.createElement(Button_1.Button, { disabled: false, buttonType: Button_1.ButtonType.primary, onClick: this.makeManifest.bind(this) }, "MultiArch")),
-                        React.createElement("div", { className: "tag-viewer-panel ms-Grid-col ms-u-sm9" }, this.state.multiManifestTags == null || this.state.multiManifestTags.length <= 0 ?
+                        React.createElement("div", { className: "tag-viewer-panel ms-Grid-col ms-u-sm9" }, this.state.multiManifestTags == null || this.state.multiManifestTags.length <= 0 || !this.show ?
                             null
                             :
                                 React.createElement("div", null,

@@ -120,12 +120,7 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
                 </div>
 
             </div>
-
-
-
-
         );
-
         return el;
     }
 

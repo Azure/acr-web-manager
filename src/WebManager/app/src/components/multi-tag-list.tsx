@@ -25,7 +25,7 @@ interface IMultiTagListState {
 export class MultiTagList extends React.Component<IMultiTagListProps, IMultiTagListState> {
     private cancel: CancelTokenSource = null;
     private hash: { [key: string]: string } = {};
-
+   
     constructor(props: IMultiTagListProps) {
         super(props);
         this.state = {
@@ -177,7 +177,6 @@ export class MultiTagList extends React.Component<IMultiTagListProps, IMultiTagL
         if (typeof (value) === "string") {
             try {
                 value = JSON.parse(value);
-
             }
             catch (err) { }
         }
@@ -242,6 +241,7 @@ export class MultiTagList extends React.Component<IMultiTagListProps, IMultiTagL
     }
 
     changeTag(e: React.FormEvent<HTMLInputElement>) {
+        //Here the replace function removes all Non-US-ASCII characters
         this.setState({
             targetTag: e.target.value.replace(/[^\x00-\x7F]/g, ""),
         } as IMultiTagListState);
@@ -272,6 +272,7 @@ export class MultiTagList extends React.Component<IMultiTagListProps, IMultiTagL
                     <option value="linux-amd64" />
                     <option value="linux-386" />
                     <option value="linux-arm" />
+                    <option value="linux-arm64" />
                     <option value="linux-s390x" />
                     <option value="linux-ppc64le" />
                 </datalist>

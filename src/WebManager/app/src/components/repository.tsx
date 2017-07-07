@@ -76,6 +76,4 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
             </div>
         );
     }
-
-
 }
