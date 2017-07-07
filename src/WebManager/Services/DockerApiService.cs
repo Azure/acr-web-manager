@@ -143,7 +143,6 @@ namespace WebManager.Services
         {
             try
             {
-                
                 HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Put,
                     new Uri(new Uri("https://" + cred.Registry), $"/v2/{repo}/manifests/{newTag}"));
 

@@ -8,24 +8,24 @@ namespace WebManager
 {
     public class APIResponse
     {
-        public string content { set; get; } 
-        public HttpStatusCode status { set; get; }
-        public string aditionalInfo { set; get; }
-        public int size { get; }
+        public string Content { set; get; } 
+        public HttpStatusCode Status { set; get; }
+        public string AditionalInfo { set; get; }
+        public int Size { get; }
 
         public APIResponse(string content, HttpStatusCode status)
         {
-            this.content = content;
-            this.status = status;
-            this.size = this.content.Length;
+            this.Content = content;
+            this.Status = status;
+            this.Size = this.Content.Length;
         }
 
         public APIResponse(string content, HttpStatusCode status, string digest)
         {
-            this.content = content;
-            this.status = status;
-            this.aditionalInfo = digest;
-            this.size = this.content.Length;
+            this.Content = content;
+            this.Status = status;
+            this.AditionalInfo = digest;
+            this.Size = this.Content.Length;
         }
     }
 }

@@ -100,11 +100,9 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
                     props.push({ key: key, value: this.renderValue(value[key]) });
                 }
             }
-
         }
 
         let el = (
-
             <div>
                 <div className="ms-Grid ms-font-m">
                     {props.map(x => (
@@ -118,7 +116,6 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
                         </div>
                     ))}
                 </div>
-
             </div>
         );
         return el;

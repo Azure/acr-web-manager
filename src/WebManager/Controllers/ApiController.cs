@@ -69,18 +69,16 @@ namespace WebManager
 
             if (resp != null)
             {
-                Response.Headers.Add("Link", resp.aditionalInfo);
+                Response.Headers.Add("Link", resp.AditionalInfo);
             }
 
             return new ContentResult()
             {
-                Content = resp.content,
+                Content = resp.Content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.status
+                StatusCode = (int) resp.Status
             };
         }
-
-    
 
         [HttpPut]
         public async Task<IActionResult> Manifest(string repo, string tag,  [FromBody] string manifest)
@@ -99,9 +97,9 @@ namespace WebManager
 
             return new ContentResult()
             {
-                Content = resp.content,
+                Content = resp.Content,
                 ContentType = "application/json",
-                StatusCode = (int)resp.status
+                StatusCode = (int)resp.Status
             };
         }
 
@@ -122,13 +120,13 @@ namespace WebManager
             }
             
             //These Headers are added because now any application thats needs these information can get it through an http request.
-            Response.Headers.Add("Docker-Content-Digest", resp.aditionalInfo);
-            Response.Headers.Add("Content-Length", resp.size + "");
+            Response.Headers.Add("Docker-Content-Digest", resp.AditionalInfo);
+            Response.Headers.Add("Content-Length", resp.Size + "");
             return new ContentResult()
             {
-                Content = resp.content,
+                Content = resp.Content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.status
+                StatusCode = (int) resp.Status
             };
         }
 
@@ -154,16 +152,16 @@ namespace WebManager
                 return new UnauthorizedResult();
             }
 
-            if (resp.aditionalInfo != null)
+            if (resp.AditionalInfo != null)
             {
-                Response.Headers.Add("Link", resp.aditionalInfo);
+                Response.Headers.Add("Link", resp.AditionalInfo);
             }
 
             return new ContentResult()
             {
-                Content = resp.content,
+                Content = resp.Content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.status
+                StatusCode = (int) resp.Status
             };
         }
 
