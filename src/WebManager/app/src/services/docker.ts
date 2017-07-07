@@ -28,7 +28,7 @@ export class Docker {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
-            params: { },
+            params: {},
             headers: {
                 "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
@@ -56,7 +56,6 @@ export class Docker {
             });
     }
 
-
     getManifestHeaders(repo: string, tag: string, cancel: CancelToken = null):
         Promise<{ manifest: string }> {
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
@@ -79,9 +78,6 @@ export class Docker {
 
         return axios.get(`/v2/${repo}/manifests/${tag}`, config)
             .then((r: AxiosResponse) => {
-
-
-
                 return { manifest: r.headers }
             }).catch((e: any) => {
                 if (axios.isCancel(e)) {
@@ -94,8 +90,6 @@ export class Docker {
             });
     }
 
- 
-
     getManifest(repo: string, tag: string, cancel: CancelToken = null):
         Promise<{ manifest: string }> {
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
@@ -106,7 +100,7 @@ export class Docker {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
-            params: { },
+            params: {},
             headers: {
                 "Registry": this.registryName,
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
@@ -118,9 +112,9 @@ export class Docker {
 
         return axios.get(`/v2/${repo}/manifests/${tag}`, config)
             .then((r: AxiosResponse) => {
-               
 
-                
+
+
                 return { manifest: r.data }
             }).catch((e: any) => {
                 if (axios.isCancel(e)) {
@@ -133,15 +127,14 @@ export class Docker {
             });
     }
 
-
     putMultiArch(repo: string, tag: string, cancel: CancelToken = null, manifest: string):
         Promise<{ rBody: string }> {
-        
+
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ rBody: null });
         }
-       
+
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
@@ -153,11 +146,8 @@ export class Docker {
             }
         };
 
-        return axios.put(`/v2/${repo}/manifests/${tag}`, manifest,config)
+        return axios.put(`/v2/${repo}/manifests/${tag}`, manifest, config)
             .then((r: AxiosResponse) => {
-
-
-
                 return { rBody: r.status }
             }).catch((e: any) => {
                 if (axios.isCancel(e)) {
@@ -169,9 +159,7 @@ export class Docker {
                 }
             });
     }
-    
 
-    
     // for whatever reason, the docker registry doesn't respect the tag pagination API...
     // this will just return all the tags at once
     getTagsForRepo(repo: string, maxResults: number | null = 10, last: string = null, cancel: CancelToken = null):
@@ -184,14 +172,14 @@ export class Docker {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
-            params: { },
+            params: {},
             headers: {
                 "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
             }
-            
+
         };
-        
+
         if (maxResults != null) {
             config.params.n = maxResults;
         }

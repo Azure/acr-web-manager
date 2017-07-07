@@ -134,6 +134,9 @@ var MultiTagList = (function (_super) {
             });
         }).catch(function (err) {
             _this.cancel = null;
+            _this.setState({
+                error: err.toString()
+            });
             if (_this.props.onLoadFailure) {
                 _this.props.onLoadFailure(err);
             }

@@ -19,10 +19,10 @@ interface IMultiTagListState {
     error: string,
     checkedTags: string[],
     multiManifestTags: string[],
-    targetTag:string
+    targetTag: string
 }
 
-export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTagListState > {
+export class MultiTagList extends React.Component<IMultiTagListProps, IMultiTagListState> {
     private cancel: CancelTokenSource = null;
     private hash: { [key: string]: string } = {};
 
@@ -111,23 +111,20 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
                 if (this.props.onLoadFailure) {
                     this.props.onLoadFailure(err);
                 }
-
             });
     }
 
     getDigestAndSize(name: string): void {
-
         this.cancel = this.props.service.createCancelToken();
         this.props.service.getManifestHeaders(this.props.params.repositoryName, name, this.cancel.token)
             .then(value => {
                 this.cancel = null;
-                if (!value) return 
+                if (!value) return
 
                 this.setState((prevState, props) => {
                     if (prevState.multiManifestTags == null) {
                         prevState.multiManifestTags = [];
                     }
-
                     var tet = this.hash[name];
                     if (tet == undefined || tet == null || tet == "") {
                         if (this.followsConvention(name)) {
@@ -147,22 +144,21 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
                             alert("Please use the following format os-architecture");
                         }
                     }
-      
+
                     prevState.multiManifestTags.push("architecture:" + arch + ";os:" + opS + ";" + this.process(value));
+
                     return prevState;
                 });
-
-
-
-            
             }).catch(err => {
                 this.cancel = null;
+                this.setState({
+                    error: err.toString()
+                } as IMultiTagListState);
+
                 if (this.props.onLoadFailure) {
                     this.props.onLoadFailure(err);
                 }
-            })
-
-
+            });
     }
 
     followsConvention(name: string): boolean {
@@ -174,17 +170,17 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
             multiManifestTags: []
         } as IMultiTagListState);
         for (let i: number = 0; i < this.state.checkedTags.length; i++)
-            this.getDigestAndSize(this.state.checkedTags[i]);      
+            this.getDigestAndSize(this.state.checkedTags[i]);
     }
 
     process(value: any): string {
         if (typeof (value) === "string") {
             try {
                 value = JSON.parse(value);
-                
+
             }
             catch (err) { }
-        } 
+        }
         if (typeof (value) === "number" ||
             typeof (value) === "string" ||
             typeof (value) === "boolean") {
@@ -195,7 +191,7 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
         }
         else {
             return this.renderObject(value);
-        }   
+        }
     }
 
     renderObject(value: any): string {
@@ -213,15 +209,15 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
                             cad += key + ":" + this.process(value[key]) + ";";
                         }
                     }
-                    
+
                 }
             }
-        }     
+        }
         return cad;
     }
 
     renderJson(value: any): string {
-        return JSON.stringify(JSON.parse(value), null, 4);      
+        return JSON.stringify(JSON.parse(value), null, 4);
     }
 
 
@@ -236,7 +232,6 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
     renderPrimitive(value: any): string {
         return value.toString();
     }
-
 
     changeText(e: React.FormEvent<HTMLInputElement>) {
         if (this.followsConvention(e.target.id) && e.target.value == "") {
@@ -255,10 +250,10 @@ export class MultiTagList extends React.Component < IMultiTagListProps, IMultiTa
         if (this.state.tags == null) {
             return null;
         }
-        let checkTags = this.state.tags.map((tag, i)=>{
+        let checkTags = this.state.tags.map((tag, i) => {
             return (
                 <div>
-                    <input type="checkbox" value={tag} id={"" + i} key={tag} onChange={this.changeToggle.bind(this)}/>
+                    <input type="checkbox" value={tag} id={"" + i} key={tag} onChange={this.changeToggle.bind(this)} />
                     <label>{tag}</label>
                 </div>);
         }, this);

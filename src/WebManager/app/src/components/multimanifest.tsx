@@ -50,13 +50,13 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
         sizeM = "";
         osM = "";
         architectureM = "";
-        
+
         for (let i: number = 0; i < allInfo.length; i++) {
             var fields: string[] = allInfo[i].split(":");
-            if (fields[0] === "docker-content-digest") {                
-                digestM = fields[1] + ":" + fields[2];                
+            if (fields[0] === "docker-content-digest") {
+                digestM = fields[1] + ":" + fields[2];
             }
-            if (fields[0] === "content-length") {                
+            if (fields[0] === "content-length") {
                 sizeM = fields[1];
             }
             if (fields[0] === "os") {
@@ -64,7 +64,7 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             }
             if (fields[0] === "architecture") {
                 architectureM = fields[1];
-            }            
+            }
         }
 
         var plat: Platform = {
@@ -106,7 +106,7 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
                     buttonType={ButtonType.primary}
                     onClick={this.pushManifest.bind(this)}>
                     Upload
-                </Button>                
+                </Button>
             </div>
         );
     }
@@ -131,7 +131,7 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
         this.cancel = this.props.service.createCancelToken();
         var manifest: string = this.escapeSpecialChars(JSON.stringify(this.createMultiArchManifest()));
         var tag: string = this.props.targetTag;
-        
+
         if (tag === "" || tag === null) {
             tag = "Multi-Arch";
         }
@@ -145,7 +145,7 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
                 }
             })
 
-        
+
     }
 
     renderObject(value: any): JSX.Element {
@@ -162,7 +162,7 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             }
         }
 
-        let el = (            
+        let el = (
             <div>
                 <div className="ms-Grid ms-font-m">
                     {props.map(x => (
@@ -227,5 +227,5 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             </pre>
         );
     }
-    
+
 }

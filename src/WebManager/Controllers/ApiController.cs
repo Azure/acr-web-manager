@@ -6,11 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace WebManager
-
-
 {
-  
-
     public class ApiController : Controller
     {
         private DockerApiService _service;
@@ -120,13 +116,14 @@ namespace WebManager
                 return new UnauthorizedResult();
             }
 
-            var resp = await _service.ManifestHeaders(cred, repo, tag);
+            var resp = await _service.Manifest(cred, repo, tag);
 
             if (resp == null)
             {
                 return new UnauthorizedResult();
             }
-        
+            
+            //These Headers are added because now any application thats needs these information can get it through an http request.
             Response.Headers.Add("Docker-Content-Digest", resp.Item3);
             Response.Headers.Add("Content-Length", resp.Item1.Length + "");
             return new ContentResult()

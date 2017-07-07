@@ -1,8 +1,6 @@
 ﻿import * as React from "react";
 import { Docker } from "../services/docker";
 
-
-
 export interface IManifestViewerProps {
     manifest: any
 }
@@ -40,8 +38,6 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
             }
             catch (err) { }
         }
-
-
         if (typeof (value) === "number" ||
             typeof (value) === "string" ||
             typeof (value) === "boolean") {
@@ -63,7 +59,7 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
                 pairs.push({ key: key, value: this.renderValue(value[key]) });
             }
         }
-        
+
         return (
             <div>
                 {
@@ -94,7 +90,7 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
 
     renderObject(value: any): JSX.Element {
         let props: { key: string, value: JSX.Element }[] = [];
-        
+
         for (let key in value) {
             if (value.hasOwnProperty(key)) {
                 if (key == "v1Compatibility") {
@@ -104,28 +100,28 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
                     props.push({ key: key, value: this.renderValue(value[key]) });
                 }
             }
-            
+
         }
 
         let el = (
-           
-                <div>
-                    <div className="ms-Grid ms-font-m">
-                        {props.map(x => (
-                            <div className="ms-Grid-row manifest-entry" key={x.key}>
-                                <div className="ms-Grid-col ms-u-sm2">
-                                    <span>{x.key}</span>
-                                </div>
-                                <div className="ms-Grid-col ms-u-sm10">
-                                    {x.value}
-                                </div>
+
+            <div>
+                <div className="ms-Grid ms-font-m">
+                    {props.map(x => (
+                        <div className="ms-Grid-row manifest-entry" key={x.key}>
+                            <div className="ms-Grid-col ms-u-sm2">
+                                <span>{x.key}</span>
                             </div>
-                        ))}
-                    </div>
-                
+                            <div className="ms-Grid-col ms-u-sm10">
+                                {x.value}
+                            </div>
+                        </div>
+                    ))}
                 </div>
-            
-         
+
+            </div>
+
+
 
 
         );
