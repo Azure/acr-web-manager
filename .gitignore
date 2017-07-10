@@ -8,4 +8,6 @@ src/**/*.xproj.user
 src/**/project.lock.json
 src/.vs/
 *.swp
+*.user
 *~
+

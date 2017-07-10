@@ -1,7 +1,6 @@
 ﻿import * as React from "react";
 import { browserHistory } from "react-router";
 import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcrumb";
-
 import { Docker } from "../services/docker";
 import { AuthBanner } from "./auth-banner";
 import { RepositoryList } from "./repository-list";

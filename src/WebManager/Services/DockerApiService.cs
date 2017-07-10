@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using WebManager.Utility;
 
@@ -46,7 +48,7 @@ namespace WebManager.Services
         /// If authentication failed, returns null.
         /// If any other error occured, throws an exception.
         /// </summary>
-        public async Task<Tuple<string, HttpStatusCode, string>> ListTags(RegistryCredential cred, string repoName, string queryString)
+        public async Task<APIResponse> ListTags(RegistryCredential cred, string repoName, string queryString)
         {
             try
             {
@@ -63,7 +65,7 @@ namespace WebManager.Services
                     return null;
                 }
 
-                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
                     resp.Headers.Contains("Link") ? resp.Headers.GetValues("Link").First() : null);
             }
             catch (HttpRequestException)
@@ -78,7 +80,7 @@ namespace WebManager.Services
         /// If any other error occured, throws an exception.
         /// </summary>
         /// <returns>A tuple containing the result, and the HTTP Link header.</returns>
-        public async Task<Tuple<string, HttpStatusCode, string>> Catalog(RegistryCredential cred, string queryString)
+        public async Task<APIResponse> Catalog(RegistryCredential cred, string queryString)
         {
             try
             {
@@ -94,7 +96,7 @@ namespace WebManager.Services
                     return null;
                 }
 
-                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode,
                     resp.Headers.Contains("Link") ? resp.Headers.GetValues("Link").First() : null);
             }
             catch (HttpRequestException)
@@ -106,7 +108,7 @@ namespace WebManager.Services
         /// <summary>
         /// Reads a manifest.
         /// </summary>
-        public async Task<Tuple<string, HttpStatusCode>> Manifest(RegistryCredential cred, string repo, string tag)
+        public async Task<APIResponse> Manifest(RegistryCredential cred, string repo, string tag)
         {
             try
             {
@@ -118,15 +120,43 @@ namespace WebManager.Services
                     "application/vnd.docker.distribution.manifest.v1+json", 0.5));
                 message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(
                     "application/vnd.docker.distribution.manifest.v2+json", 0.6));
-
+                message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(
+                    "application/vnd.docker.distribution.manifest.list.v2+json", 0.7));
                 var resp = await client.SendAsync(message);
 
                 if (resp.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     return null;
                 }
+               
+                IEnumerable<string> res = resp.Headers.GetValues("Docker-Content-Digest");
+                string ans = res.ToArray()[0];
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode,ans);
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
 
-                return Tuple.Create(await resp.Content.ReadAsStringAsync(), resp.StatusCode);
+        public async Task<APIResponse> PutMultiArch(RegistryCredential cred, string repo, string newTag,string manifest)
+        {
+            try
+            {
+                HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Put,
+                    new Uri(new Uri("https://" + cred.Registry), $"/v2/{repo}/manifests/{newTag}"));
+
+                message.Headers.Authorization = new AuthenticationHeaderValue("Basic", cred.BasicAuth);
+                
+                message.Content = new StringContent(manifest,Encoding.UTF8, "application/vnd.docker.distribution.manifest.list.v2+json");
+                
+                var resp = await client.SendAsync(message);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    return null;
+                }
+                return new APIResponse(await resp.Content.ReadAsStringAsync(), resp.StatusCode);
             }
             catch (HttpRequestException)
             {

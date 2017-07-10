@@ -1,11 +1,10 @@
 ﻿import * as React from "react";
 import { Router, Route, browserHistory } from "react-router";
-
 import { Docker } from "../services/docker";
-
 import { Catalog } from "./catalog";
 import { Repository } from "./repository";
 import { Login } from "./login";
+import { MultiArch } from "./multiarch"
 
 export interface IApplicationProps { }
 interface IApplicationState { }
@@ -21,6 +20,7 @@ export class Application extends React.Component<IApplicationProps, IApplication
                 <Route path="/" component={Login} />
                 <Route path=":registryName" component={Catalog} />
                 <Route path=":registryName/:repositoryName" component={Repository} />
+                <Route path=":registryName/:repositoryName/multiarch" component={MultiArch} />
             </Router>
         );
     }

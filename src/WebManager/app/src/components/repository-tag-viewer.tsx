@@ -3,10 +3,15 @@ import { CancelTokenSource } from "axios";
 import { Docker } from "../services/docker";
 import { RepositoryTagList } from "./repository-tag-list";
 import { ManifestViewer } from "./manifest-viewer";
+import {
+    Button,
+    ButtonType
+} from "office-ui-fabric-react/lib/Button";
+import { browserHistory } from "react-router";
 
 export interface IRepositoryTagViewerProps {
-    repositoryName: string,
-    service: Docker
+    service: Docker,
+    params: any
 }
 interface IRepositoryTagViewerState {
     manifest: any,
@@ -31,11 +36,10 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
         }
         this.cancel = this.props.service.createCancelToken();
 
-        this.props.service.getManifest(this.props.repositoryName, tag, this.cancel.token)
+        this.props.service.getManifest(this.props.params.repositoryName, tag, this.cancel.token)
             .then(value => {
                 this.cancel = null;
                 if (!value) return;
-
                 this.setState({
                     manifest: value.manifest,
                     manifestError: null
@@ -70,52 +74,69 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
 
     render(): JSX.Element {
         return (
-            <div className="ms-Grid">
-                {
-                    this.state.tagsLoadError ?
-                        <span className="ms-font-xxl">
-                            {this.state.tagsLoadError.toString()}
-                        </span>
-                        :
-                        <div className="ms-Grid-row">
-                            <div className="tag-viewer-list ms-Grid-col ms-u-sm3">
-                                <RepositoryTagList
-                                    service={this.props.service}
-                                    repositoryName={this.props.repositoryName}
-                                    onTagClick={this.onTagSelected.bind(this)}
-                                    onLoadFailure={this.onLoadFailure.bind(this)} />
-                            </div>
-                            <div className="tag-viewer-panel ms-Grid-col ms-u-sm9">
-                                {
-                                    this.state.manifest == null ?
-                                        null
-                                        :
-                                        (this.state.manifest instanceof String ?
-                                            this.state.manifest
+            <div>
+                <div className="ms-Grid">
+                    {
+                        this.state.tagsLoadError ?
+                            <span className="ms-font-xxl">
+                                {this.state.tagsLoadError.toString()}
+                            </span>
+                            :
+                            <div className="ms-Grid-row">
+                                <div className="tag-viewer-list ms-Grid-col ms-u-sm3">
+                  
+                                    <RepositoryTagList
+                                        service={this.props.service}
+                                        repositoryName={this.props.params.repositoryName}
+                                        onTagClick={this.onTagSelected.bind(this)}
+                                        onLoadFailure={this.onLoadFailure.bind(this)} />
+                                    <br/>
+                                    <Button disabled={false}
+                                        buttonType={ButtonType.primary}
+                                        onClick={this.multiArch.bind(this)}>
+                                        Create MultiArch
+                                        </Button>
+                                </div>
+                                    
+                                
+                                <div className="tag-viewer-panel ms-Grid-col ms-u-sm9">
+                                    {
+                                        this.state.manifest == null ?
+                                            null
                                             :
-                                            <ManifestViewer
-                                                manifest={this.state.manifest} />
-                                        )
-                                }
-                                {
-                                    this.state.manifestError == null ?
-                                        null
-                                        :
-                                        <pre>
-                                            {"An error occurred while loading manifest:\n"}
-                                            {
-                                                this.state.manifestError instanceof Error ?
-                                                    this.state.manifestError.toString() +
-                                                        this.state.manifestError.stack
-                                                    :
-                                                    JSON.stringify(this.state.manifestError, null, 4)
-                                            }
-                                        </pre>
-                                }
+                                            (this.state.manifest instanceof String ?
+                                                this.state.manifest
+                                                :
+                                                <ManifestViewer
+                                                    manifest={this.state.manifest} />
+                                            )
+                                    }
+                                    {
+                                        this.state.manifestError == null ?
+                                            null
+                                            :
+                                            <pre>
+                                                {"An error occurred while loading manifest:\n"}
+                                                {
+                                                    this.state.manifestError instanceof Error ?
+                                                        this.state.manifestError.toString() +
+                                                            this.state.manifestError.stack
+                                                        :
+                                                        JSON.stringify(this.state.manifestError, null, 4)
+                                                }
+                                            </pre>
+                                    }
+                                </div>
                             </div>
-                        </div>
-                }
+                    }
+                </div>
             </div>
+
         );
     }
+
+    multiArch(): void {
+        browserHistory.push(`/${this.props.params.registryName}/${this.props.params.repositoryName}/multiarch`);
+    }
+ 
 }

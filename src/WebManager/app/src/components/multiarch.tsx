@@ -1,37 +1,34 @@
-﻿import * as React from "react";
-import { browserHistory } from "react-router";
-import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcrumb";
-
+import * as React from "react";
 import { Docker } from "../services/docker";
 import { AuthBanner } from "./auth-banner";
+import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcrumb";
+import { browserHistory } from "react-router";
 import { RepositoryTagViewer } from "./repository-tag-viewer";
-import {
-    Button,
-    ButtonType
-} from "office-ui-fabric-react/lib/Button";
-export interface IRepositoryProps { params: any }
-interface IRepositoryState { isLoggedIn: boolean, service: Docker }
+import { CancelTokenSource } from "axios";
+import { MultiTagViewer } from "./multi-tag-viewer";
 
-export class Repository extends React.Component<IRepositoryProps, IRepositoryState> {
-    constructor(props: IRepositoryProps) {
+export interface IMultiArchProps { params: any}
+interface IMultiArchState { isLoggedIn: boolean, service: Docker}
+
+export class MultiArch extends React.Component<IMultiArchProps, IMultiArchState> {
+    constructor(props: IMultiArchProps) {
         super(props);
 
         this.state = {
             service: new Docker(this.props.params.registryName),
-            isLoggedIn: false
+            isLoggedIn: false,
         };
     }
-
     onLogout(): void {
         this.setState({
             isLoggedIn: false
-        } as IRepositoryState);
+        } as IMultiArchState);
     }
 
     onLogin(): void {
         this.setState({
             isLoggedIn: true
-        } as IRepositoryState);
+        } as IMultiArchState);
     }
 
     render(): JSX.Element {
@@ -41,7 +38,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                     onLogin={this.onLogin.bind(this)}
                     onLogout={this.onLogout.bind(this)}
                     service={this.state.service} />
-                
+
                 <div id="page" className="page">
                     <Breadcrumb items={[
                         {
@@ -56,23 +53,26 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                         },
                         {
                             text: this.props.params.repositoryName,
-                            key: "3"
+                            key: "3",
+                            onClick: () => browserHistory.push("/" + this.props.params.registryName + "/" + this.props.params.repositoryName)
+                        },
+                        {
+                            text: "MultiArch",
+                            key: "4"
                         }
                     ]} className="breadcrumb" />
+                 
                     {
                         !this.state.isLoggedIn ?
                             null :
                             <div>
-                                <RepositoryTagViewer
+                                <MultiTagViewer
                                     service={this.state.service}
                                     params={this.props.params}
-                                />
+                                />                                                               
                             </div>
                     }
-                    
-              
-                </div>
-             
+                </div>                   
             </div>
         );
     }

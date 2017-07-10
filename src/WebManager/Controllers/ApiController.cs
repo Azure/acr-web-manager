@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using WebManager.Services;
 using WebManager.Utility;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace WebManager
 {
@@ -65,16 +67,39 @@ namespace WebManager
                 return new UnauthorizedResult();
             }
 
-            if (resp.Item3 != null)
+            if (resp != null)
             {
-                Response.Headers.Add("Link", resp.Item3);
+                Response.Headers.Add("Link", resp.AditionalInfo);
             }
 
             return new ContentResult()
             {
-                Content = resp.Item1,
+                Content = resp.Content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int) resp.Status
+            };
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Manifest(string repo, string tag,  [FromBody] string manifest)
+        {
+            RegistryCredential cred = GetDockerCredential();
+            if (cred == null)
+            {
+                return new UnauthorizedResult();
+            }
+           
+            var resp = await _service.PutMultiArch(cred, repo, tag, manifest);
+            if(resp == null)
+            {
+                return new UnauthorizedResult();
+            }
+
+            return new ContentResult()
+            {
+                Content = resp.Content,
+                ContentType = "application/json",
+                StatusCode = (int)resp.Status
             };
         }
 
@@ -93,12 +118,15 @@ namespace WebManager
             {
                 return new UnauthorizedResult();
             }
-
+            
+            //These Headers are added because now any application thats needs these information can get it through an http request.
+            Response.Headers.Add("Docker-Content-Digest", resp.AditionalInfo);
+            Response.Headers.Add("Content-Length", resp.Size + "");
             return new ContentResult()
             {
-                Content = resp.Item1,
+                Content = resp.Content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int) resp.Status
             };
         }
 
@@ -124,16 +152,16 @@ namespace WebManager
                 return new UnauthorizedResult();
             }
 
-            if (resp.Item3 != null)
+            if (resp.AditionalInfo != null)
             {
-                Response.Headers.Add("Link", resp.Item3);
+                Response.Headers.Add("Link", resp.AditionalInfo);
             }
 
             return new ContentResult()
             {
-                Content = resp.Item1,
+                Content = resp.Content,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int) resp.Status
             };
         }
 
