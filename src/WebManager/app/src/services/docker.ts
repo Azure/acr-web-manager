@@ -110,9 +110,6 @@ export class Docker {
 
         return axios.get(`/v2/${repo}/manifests/${tag}`, config)
             .then((r: AxiosResponse) => {
-
-
-
                 return { manifest: r.data }
             }).catch((e: any) => {
                 if (axios.isCancel(e)) {

@@ -39,12 +39,11 @@ export class MultiTagList extends React.Component<IMultiTagListProps, IMultiTagL
     }
 
     changeToggle(e: React.FormEvent<HTMLInputElement>) {
-
         let tempArray = this.state.checkedTags;
-        if (e.target.checked === true) {
-            if (this.followsConvention(e.target.value) && this.hash[e.target.value] != "") {
+        if (e.target.checked) {
+            if (this.followsConvention(e.target.value) && this.hash[e.target.value] !== "") {
                 var aux = e.target.value.split("-");
-                this.hash[e.target.value] = aux[1] + "-" + aux[2];
+                this.hash[e.target.value] = `${aux[1]}-${aux[2]}`;
             }
             tempArray.push(e.target.value);
             this.setState({

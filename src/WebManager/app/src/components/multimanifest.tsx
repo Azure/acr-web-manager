@@ -98,7 +98,6 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
     }
 
     render(): JSX.Element {
-
         return (
             <div>
                 {this.renderValue(this.createMultiArchManifest())}
@@ -110,8 +109,6 @@ export class MultiManifest extends React.Component<IMultiManifestProps, IMultiMa
             </div>
         );
     }
-
-
 
     escapeSpecialChars(s: string) {
         return s.replace(/\\n/g, "\\n")
