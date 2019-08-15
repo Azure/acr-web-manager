@@ -51,27 +51,29 @@ export class RepositoryList extends React.Component<IRepositoryListProps, IRepos
         this.cancel = this.props.service.createCancelToken();
 
         this.props.service.getRepos(10, lastRepo, this.cancel.token)
-            .then(value => {
-                this.cancel = null;
+            .then((value: { repositories: any; httpLink: any; }) => {
+                    this.cancel = null;
 
-                if (!value) return;
+                    if (!value) return;
 
-                this.setState((prevState, props) => {
-                    if (prevState.repositories == null) {
-                        prevState.repositories = [];
-                    }
-
-                    for (let repository of value.repositories) {
-                        prevState.repositories.push(repository);
-                    }
-
-                    prevState.hasMoreRepositories = value.httpLink !== undefined;
-
-                    return prevState;
+                    this.setState((prevState) => {
+                        let newRepositories: string[] = []
+                        if (prevState.repositories != null) {
+                            for (let repository of prevState.repositories) {
+                                newRepositories.push(repository);
+                            }
+                        }
+                        for (let repository of value.repositories) {
+                            newRepositories.push(repository);
+                        }
+                        return {
+                            repositories: newRepositories,
+                            hasMoreRepositories: value.httpLink !== undefined
+                        };
+                    });
+                }).catch((err: any) => {
+                    this.cancel = null;
                 });
-            }).catch((err: any) => {
-                this.cancel = null;
-            });
     }
 
     renderRepositories(): JSX.Element[] {

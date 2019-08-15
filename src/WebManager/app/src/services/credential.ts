@@ -1,4 +1,4 @@
-export class RegistryCredentials {
+﻿export class RegistryCredentials {
     basicAuth: string;
     username: string;
 }

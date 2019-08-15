@@ -9,3 +9,5 @@ src/**/project.lock.json
 src/.vs/
 *.swp
 *~
+*.js
+*.js.map

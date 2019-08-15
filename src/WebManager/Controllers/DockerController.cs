@@ -3,16 +3,20 @@ using System.Threading.Tasks;
 using WebManager.Services;
 using WebManager.Utility;
 
-namespace WebManager
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace WebManager.Controllers
 {
-    public class ApiController : Controller
+    [Route("api/docker")]
+    public class DockerController : Controller
     {
         private DockerApiService _service;
 
-        public ApiController(DockerApiService service)
+        public DockerController(DockerApiService service)
         {
             _service = service;
         }
+
 
         public RegistryCredential GetDockerCredential()
         {
@@ -43,13 +47,37 @@ namespace WebManager
             return new RegistryCredential() { BasicAuth = basicAuth, Registry = Request.Headers["Registry"] };
         }
 
-        /// <summary>
-        /// The client should set the following headers:
-        /// Authorization: Basic
-        /// Registry: (the name of the registry to access)
-        /// </summary>
+        // GET: api/<controller>
         [HttpGet]
-        public async Task<IActionResult> Catalog()
+        public async Task<IActionResult> Get()
+        {
+            RegistryCredential cred = GetDockerCredential();
+            if (cred == null)
+            {
+                return new UnauthorizedResult();
+            }
+
+            if (cred.Registry == null)
+            {
+                return new UnauthorizedResult();
+            }
+
+            if (!cred.Registry.Contains("."))
+            {
+                return new UnauthorizedResult();
+            }
+
+            if (await _service.TestCredentials(cred.Registry, cred.BasicAuth))
+            {
+                return new OkResult();
+            }
+
+            return new UnauthorizedResult();
+        }
+
+        // GET api/<controller>/5
+        [HttpGet("catalog")]
+        public async Task<IActionResult> GetCatalog()
         {
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
@@ -74,11 +102,11 @@ namespace WebManager
             {
                 Content = resp.Item1,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int)resp.Item2
             };
         }
 
-        [HttpGet]
+        [HttpGet("{repo}/{tag}")]
         public async Task<IActionResult> Manifest(string repo, string tag)
         {
             RegistryCredential cred = GetDockerCredential();
@@ -98,7 +126,7 @@ namespace WebManager
             {
                 Content = resp.Item1,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int)resp.Item2
             };
         }
 
@@ -107,7 +135,7 @@ namespace WebManager
         /// Authorization: Basic
         /// Registry: (the name of the registry to access)
         /// </summary>
-        [HttpGet]
+        [HttpGet("tags/{name}")]
         public async Task<IActionResult> ListTags(string name)
         {
             RegistryCredential cred = GetDockerCredential();
@@ -133,36 +161,26 @@ namespace WebManager
             {
                 Content = resp.Item1,
                 ContentType = "application/json",
-                StatusCode = (int) resp.Item2
+                StatusCode = (int)resp.Item2
             };
         }
 
-        [HttpGet]
-        public async Task<IActionResult> VerifyCredential()
+        // POST api/<controller>
+        [HttpPost]
+        public void Post([FromBody]string value)
         {
-            RegistryCredential cred = GetDockerCredential();
-            if (cred == null)
-            {
-                return new UnauthorizedResult();
-            }
+        }
 
-            if (cred.Registry == null)
-            {
-                return new UnauthorizedResult();
-            }
+        // PUT api/<controller>/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody]string value)
+        {
+        }
 
-            // must have a TLD
-            if (!cred.Registry.Contains("."))
-            {
-                return new UnauthorizedResult();
-            }
-
-            if (await _service.TestCredentials(cred.Registry, cred.BasicAuth))
-            {
-                return new OkResult();
-            }
-
-            return new UnauthorizedResult();
+        // DELETE api/<controller>/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
         }
     }
 }

@@ -57,13 +57,13 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
 
     onUsernameChange(e: React.FormEvent<HTMLInputElement>): void {
         this.setState({
-            formUsername: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+            formUsername: (e.target as HTMLInputElement).value.replace(/[^\x00-\x7F]/g, ""),
         } as IAuthBannerState);
     }
 
     onPasswordChange(e: React.FormEvent<HTMLInputElement>): void {
         this.setState({
-            formPassword: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+            formPassword: (e.target as HTMLInputElement).value.replace(/[^\x00-\x7F]/g, ""),
         } as IAuthBannerState);
     }
 
@@ -100,7 +100,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
 
         this.cancel = this.props.service.createCancelToken();
 
-        this.props.service.tryAuthenticate(cred, this.cancel.token)
+        this.props.service.tryAuthenticate(cred)
             .then((success: boolean) => {
                 this.cancel = null;
 

@@ -1,15 +1,12 @@
 ﻿import * as React from "react";
-import { browserHistory } from "react-router";
-import { CancelTokenSource } from "axios";
 import {
     Button,
     ButtonType
-} from "office-ui-fabric-react/lib/Button";
-
+} from "office-ui-fabric-react";
+import * as axios from "axios"
 import { RegistryCredentials, CredentialService } from "../services/credential";
 import { Docker } from "../services/docker";
-
-import { RepositoryList } from "./repository-list";
+import history from './history'
 
 export interface ILoginProps { }
 interface ILoginState {
@@ -21,7 +18,6 @@ interface ILoginState {
 
 export class Login extends React.Component<ILoginProps, ILoginState> {
     private credService: CredentialService = new CredentialService();
-    private cancel: CancelTokenSource = null;
 
     constructor(props: ILoginProps) {
         super(props);
@@ -48,27 +44,24 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     }
 
     componentWillUnmount(): void {
-        if (this.cancel) {
-            this.cancel.cancel("component unmounting");
-            this.cancel = null;
-        }
+
     }
 
     onRegistryChange(e: React.FormEvent<HTMLInputElement>): void {
         this.setState({
-            formRegistry: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+            formRegistry: (e.target as HTMLInputElement).value.replace(/[^\x00-\x7F]/g, ""),
         } as ILoginState);
     }
 
     onUsernameChange(e: React.FormEvent<HTMLInputElement>): void {
         this.setState({
-            formUsername: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+            formUsername: (e.target as HTMLInputElement).value.replace(/[^\x00-\x7F]/g, ""),
         } as ILoginState);
     }
 
     onPasswordChange(e: React.FormEvent<HTMLInputElement>): void {
         this.setState({
-            formPassword: e.target.value.replace(/[^\x00-\x7F]/g, ""),
+            formPassword: (e.target as HTMLInputElement).value.replace(/[^\x00-\x7F]/g, ""),
         } as ILoginState);
     }
 
@@ -79,10 +72,6 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     }
 
     submitCredential(): void {
-        if (this.cancel) {
-            return;
-        }
-
         let cred: RegistryCredentials = new RegistryCredentials();
         let service: Docker = new Docker(this.extractDomain(this.state.formRegistry));
 
@@ -94,16 +83,12 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             formMessage: "",
         } as ILoginState);
 
-        this.cancel = service.createCancelToken();
-
-        service.tryAuthenticate(cred, this.cancel.token)
+        service.tryAuthenticate(cred)
             .then((success: boolean) => {
-                this.cancel = null;
 
                 if (success) {
                     this.credService.setRegistryCredentials(service.registryName, cred);
-
-                    browserHistory.push("/" + service.registryName);
+                    history.push("/" + service.registryName)
                 }
                 else {
                     this.setState({
@@ -111,8 +96,6 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                     } as ILoginState);
                 }
             }).catch((err: any) => {
-                this.cancel = null;
-
                 this.setState({
                     formMessage: "Network error"
                 } as ILoginState);
@@ -154,7 +137,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                                 onKeyPress={this.onPasswordKeyPress.bind(this)} />
                         </div>
                         <div className="login-button">
-                            <Button disabled={this.cancel != null}
+                            <Button
                                 buttonType={ButtonType.primary}
                                 onClick={this.submitCredential.bind(this)} >
                                 Log in

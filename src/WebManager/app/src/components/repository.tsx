@@ -1,20 +1,19 @@
 ﻿import * as React from "react";
-import { browserHistory } from "react-router";
+import history from "./history";
 import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcrumb";
 
 import { Docker } from "../services/docker";
 import { AuthBanner } from "./auth-banner";
 import { RepositoryTagViewer } from "./repository-tag-viewer";
 
-export interface IRepositoryProps { params: any }
+export interface IRepositoryProps { match: any }
 interface IRepositoryState { isLoggedIn: boolean, service: Docker }
 
 export class Repository extends React.Component<IRepositoryProps, IRepositoryState> {
     constructor(props: IRepositoryProps) {
         super(props);
-
         this.state = {
-            service: new Docker(this.props.params.registryName),
+            service: new Docker(this.props.match.params.registryName),
             isLoggedIn: false
         };
     }
@@ -43,15 +42,15 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                         {
                             text: "Home",
                             key: "1",
-                            onClick: () => browserHistory.push("/")
+                            onClick: () => history.push("/")
                         },
                         {
                             text: this.state.service.registryName,
                             key: "2",
-                            onClick: () => browserHistory.push("/" + this.props.params.registryName)
+                            onClick: () => history.push("/" + this.props.match.params.registryName)
                         },
                         {
-                            text: this.props.params.repositoryName,
+                            text: this.props.match.params.repositoryName,
                             key: "3"
                         }
                     ]} className="breadcrumb" />
@@ -61,7 +60,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                             <div>
                                 <RepositoryTagViewer
                                     service={this.state.service}
-                                    repositoryName={this.props.params.repositoryName}
+                                    repositoryName={this.props.match.params.repositoryName}
                                     />
                             </div>
                     }

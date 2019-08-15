@@ -88,31 +88,27 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
 
         this.cancel = this.props.service.createCancelToken();
         this.props.service.getTagsForRepo(this.props.repositoryName, 10, last, this.cancel.token)
-            .then(value => {
+            .then((value: { tags: any; httpLink: any; }) => {
                 this.cancel = null;
                 if (!value) return;
 
-                this.setState((prevState, props) => {
-                    if (prevState.tags == null) {
-                        prevState.tags = [];
+                this.setState((prevState) => {
+                    let newTags: string[] = []
+                    if (prevState.tags != null) {
+                        for (let tag of prevState.tags) {
+                            newTags.push(tag);
+                        }
                     }
                     for (let tag of value.tags) {
-                        prevState.tags.push(tag);
+                        newTags.push(tag);
                     }
-
-                    prevState.hasMoreTags = value.httpLink !== undefined;
-
-                    return prevState;
+                    return {
+                        tags: newTags,
+                        hasMoreTags: value.httpLink !== undefined,
+                    };
                 });
-            }).catch(err => {
+            }).catch((err: any) => {
                 this.cancel = null;
-                this.setState({
-                    error: err.toString()
-                } as IRepositoryTagListState);
-
-                if (this.props.onLoadFailure) {
-                    this.props.onLoadFailure(err);
-                }
             });
     }
 

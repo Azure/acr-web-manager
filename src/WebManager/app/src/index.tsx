@@ -1,4 +1,4 @@
-﻿import * as React from "react";
+import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as ES6Promise from "es6-promise";
 

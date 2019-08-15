@@ -28,7 +28,7 @@ namespace WebManager.Services
             try
             {
                 HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get,
-                    new Uri(new Uri("https://" + registry), "/v2"));
+                    new Uri(new Uri("https://" + registry), "/v2/"));
 
                 message.Headers.Authorization = new AuthenticationHeaderValue("Basic", authString);
 

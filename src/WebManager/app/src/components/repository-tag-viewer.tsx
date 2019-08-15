@@ -32,7 +32,7 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
         this.cancel = this.props.service.createCancelToken();
 
         this.props.service.getManifest(this.props.repositoryName, tag, this.cancel.token)
-            .then(value => {
+            .then((value: {manifest: any}) => {
                 this.cancel = null;
                 if (!value) return;
 
@@ -40,18 +40,8 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
                     manifest: value.manifest,
                     manifestError: null
                 } as IRepositoryTagViewerState);
-            }).catch(err => {
+            }).catch((err: any) => {
                 this.cancel = null;
-
-                try {
-                    err.config.headers.Authorization = "Removed for privacy";
-                }
-                catch (err) { }
-
-                this.setState({
-                    manifest: null,
-                    manifestError: err
-                } as IRepositoryTagViewerState);
             });
     }
 

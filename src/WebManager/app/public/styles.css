@@ -1,4 +1,4 @@
-body {
+﻿body {
     margin: 0;
 }
 
@@ -67,6 +67,7 @@ pre {
 .banner-logged-in {
     display: block;
 }
+
 .banner-logout {
     text-decoration: underline;
     display: inline-block;
@@ -103,7 +104,7 @@ pre {
 
 .login-title {
     padding-top: 100px;
-    margin: auto;
+    margin-bottom: 50px;
     text-align: center;
     height: 50px;
 }
@@ -132,6 +133,7 @@ pre {
 .breadcrumb li a {
     max-width: 320px !important;
 }
+
 .breadcrumb {
     margin-bottom: 20px !important;
 }
@@ -139,9 +141,11 @@ pre {
 .repo-list-item::before {
     content: none;
 }
+
 .repo-list-item:hover {
     cursor: default !important;
 }
+
 .repo-list-item {
     border-top: 1px solid #EEE;
     border-bottom: 1px solid #EEE;
@@ -150,11 +154,14 @@ pre {
 .repo-list-item-tags-item::before {
     content: none;
 }
+
 .repo-list-item-tags-item:hover {
     background-color: #DDD !important;
 }
+
 .repo-list-item-tags-item {
 }
+
 .repo-list-item-tags-icon {
     position: absolute;
     left: 10px;
@@ -201,45 +208,46 @@ pre {
     margin: 0px 0px;
 }
 
-.manifest-entry:last-child {
-    border-bottom: none;
-}
+    .manifest-entry:last-child {
+        border-bottom: none;
+    }
 
-.manifest-entry ul {
-    padding: 0;
-    margin: 0;
-}
+    .manifest-entry ul {
+        padding: 0;
+        margin: 0;
+    }
 
-.manifest-entry li {
-    padding-left: 20px;
-    position: relative;
-    list-style: none;
-    margin-bottom: 1em;
-    border-bottom: 1px solid #AAA;
-}
+    .manifest-entry li {
+        padding-left: 20px;
+        position: relative;
+        list-style: none;
+        margin-bottom: 1em;
+        border-bottom: 1px solid #AAA;
+    }
 
-.manifest-entry li:last-child {
-    border-bottom: none;
-}
+        .manifest-entry li:last-child {
+            border-bottom: none;
+        }
 
-.manifest-entry span {
-    display: block;
-}
+    .manifest-entry span {
+        display: block;
+    }
 
-.manifest-entry pre {
-    margin: 0;
-    overflow-x: auto;
-    display: inline-block;
-    max-width: 100%;
-    background: #EEE;
-}
+    .manifest-entry pre {
+        margin: 0;
+        overflow-x: auto;
+        display: inline-block;
+        max-width: 100%;
+        background: #EEE;
+    }
 
 .clickable {
     cursor: pointer !important;
 }
-.clickable:hover {
-    cursor: pointer !important;
-}
+
+    .clickable:hover {
+        cursor: pointer !important;
+    }
 
 .body-bottom-padding {
     padding-bottom: 150px;
