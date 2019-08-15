@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 using WebManager.Services;
 using WebManager.Utility;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace WebManager.Controllers
 {
-    [Route("api/docker")]
+    [Route("v2")]
     public class DockerController : Controller
     {
         private DockerApiService _service;
@@ -47,37 +45,13 @@ namespace WebManager.Controllers
             return new RegistryCredential() { BasicAuth = basicAuth, Registry = Request.Headers["Registry"] };
         }
 
-        // GET: api/<controller>
-        [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            RegistryCredential cred = GetDockerCredential();
-            if (cred == null)
-            {
-                return new UnauthorizedResult();
-            }
-
-            if (cred.Registry == null)
-            {
-                return new UnauthorizedResult();
-            }
-
-            if (!cred.Registry.Contains("."))
-            {
-                return new UnauthorizedResult();
-            }
-
-            if (await _service.TestCredentials(cred.Registry, cred.BasicAuth))
-            {
-                return new OkResult();
-            }
-
-            return new UnauthorizedResult();
-        }
-
-        // GET api/<controller>/5
-        [HttpGet("catalog")]
-        public async Task<IActionResult> GetCatalog()
+        /// <summary>
+        /// The client should set the following headers:
+        /// Authorization: Basic
+        /// Registry: (the name of the registry to access)
+        /// </summary>
+        [HttpGet("_catalog")]
+        public async Task<IActionResult> Catalog()
         {
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
@@ -106,7 +80,7 @@ namespace WebManager.Controllers
             };
         }
 
-        [HttpGet("{repo}/{tag}")]
+        [HttpGet("{repo}/manifests/{tag}")]
         public async Task<IActionResult> Manifest(string repo, string tag)
         {
             RegistryCredential cred = GetDockerCredential();
@@ -135,7 +109,7 @@ namespace WebManager.Controllers
         /// Authorization: Basic
         /// Registry: (the name of the registry to access)
         /// </summary>
-        [HttpGet("tags/{name}")]
+        [HttpGet("{name}/tags/list")]
         public async Task<IActionResult> ListTags(string name)
         {
             RegistryCredential cred = GetDockerCredential();
@@ -165,22 +139,31 @@ namespace WebManager.Controllers
             };
         }
 
-        // POST api/<controller>
-        [HttpPost]
-        public void Post([FromBody]string value)
+        [HttpGet]
+        public async Task<IActionResult> VerifyCredential()
         {
-        }
+            RegistryCredential cred = GetDockerCredential();
+            if (cred == null)
+            {
+                return new UnauthorizedResult();
+            }
 
-        // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
+            if (cred.Registry == null)
+            {
+                return new UnauthorizedResult();
+            }
 
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (!cred.Registry.Contains("."))
+            {
+                return new UnauthorizedResult();
+            }
+
+            if (await _service.TestCredentials(cred.Registry, cred.BasicAuth))
+            {
+                return new OkResult();
+            }
+
+            return new UnauthorizedResult();
         }
     }
 }

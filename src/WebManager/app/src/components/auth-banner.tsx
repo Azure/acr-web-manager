@@ -100,7 +100,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
 
         this.cancel = this.props.service.createCancelToken();
 
-        this.props.service.tryAuthenticate(cred)
+        this.props.service.tryAuthenticate(cred, this.cancel.token)
             .then((success: boolean) => {
                 this.cancel = null;
 

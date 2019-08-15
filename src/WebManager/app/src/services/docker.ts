@@ -42,7 +42,7 @@ export class Docker {
             config.params.last = last;
         }
 
-        return axios.get("/api/docker/catalog", config)
+        return axios.get("/v2/_catalog", config)
             .then((r: AxiosResponse) => {
                 return { repositories: r.data.repositories, httpLink: r.headers.link }
             }).catch((e: any) => {
@@ -75,7 +75,7 @@ export class Docker {
             }
         };
 
-        return axios.get(`/api/docker/${repo}/${tag}`, config)
+        return axios.get(`/v2/${repo}/manifests/${tag}`, config)
             .then((r: AxiosResponse) => {
                 return { manifest: r.data }
             }).catch((e: any) => {
@@ -115,7 +115,7 @@ export class Docker {
             config.params.last = last;
         }
 
-        return axios.get(`/api/docker/tags/${repo}`, config)
+        return axios.get(`/v2/${repo}/tags/list`, config)
             .then((r: AxiosResponse) => {
                 if (r.data.tags === undefined) {
                     console.log(r.data.errors)
@@ -134,8 +134,9 @@ export class Docker {
             });
     }
 
-    tryAuthenticate(cred: RegistryCredentials): any {
+    tryAuthenticate(cred: RegistryCredentials, cancel: CancelToken = null): any {
         let config: AxiosRequestConfig = {
+            cancelToken: cancel,
             baseURL: this.registryEndpoint,
             headers: {
                 "Registry": this.registryName,
@@ -143,7 +144,7 @@ export class Docker {
             }
         }
 
-        return axios.get("/api/docker", config)
+        return axios.get("/v2/", config)
             .then((r: AxiosResponse) => {
                 if (r.status === 200) {
                     this.credService.setRegistryCredentials(this.registryName, cred);

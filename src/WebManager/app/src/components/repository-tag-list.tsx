@@ -57,7 +57,7 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
             return this.state.tags.map((tag: string) => (
                 <li key={tag}
                     className="ms-ListItem is-selectable repo-list-item-tags-item"
-                    onClick={() => { this.props.onTagClick(tag); } }>
+                    onClick={() => { this.props.onTagClick(tag); }}>
                     <i className="ms-Icon ms-Icon--Tag repo-list-item-tags-icon" aria-hidden="true"></i>
                     {tag}
                 </li>
@@ -109,6 +109,13 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
                 });
             }).catch((err: any) => {
                 this.cancel = null;
+                this.setState({
+                    error: err.toString()
+                } as IRepositoryTagListState);
+
+                if (this.props.onLoadFailure) {
+                    this.props.onLoadFailure(err);
+                }
             });
     }
 

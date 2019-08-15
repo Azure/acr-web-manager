@@ -42,6 +42,16 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
                 } as IRepositoryTagViewerState);
             }).catch((err: any) => {
                 this.cancel = null;
+
+                try {
+                    err.config.headers.Authorization = "Removed for privacy";
+                }
+                catch (err) { }
+
+                this.setState({
+                    manifest: null,
+                    manifestError: err
+                } as IRepositoryTagViewerState);
             });
     }
 

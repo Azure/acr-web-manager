@@ -12,6 +12,7 @@ interface IRepositoryState { isLoggedIn: boolean, service: Docker }
 export class Repository extends React.Component<IRepositoryProps, IRepositoryState> {
     constructor(props: IRepositoryProps) {
         super(props);
+
         this.state = {
             service: new Docker(this.props.match.params.registryName),
             isLoggedIn: false

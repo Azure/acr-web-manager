@@ -12,6 +12,7 @@ namespace WebManager
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseWebRoot("app")
                 .UseStartup<Startup>();
     }
 }

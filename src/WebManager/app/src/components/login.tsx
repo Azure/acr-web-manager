@@ -1,9 +1,10 @@
 ﻿import * as React from "react";
+import { CancelTokenSource } from "axios";
 import {
     Button,
     ButtonType
 } from "office-ui-fabric-react";
-import * as axios from "axios"
+
 import { RegistryCredentials, CredentialService } from "../services/credential";
 import { Docker } from "../services/docker";
 import history from './history'
@@ -18,6 +19,7 @@ interface ILoginState {
 
 export class Login extends React.Component<ILoginProps, ILoginState> {
     private credService: CredentialService = new CredentialService();
+    private cancel: CancelTokenSource = null;
 
     constructor(props: ILoginProps) {
         super(props);
@@ -44,7 +46,10 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     }
 
     componentWillUnmount(): void {
-
+        if (this.cancel) {
+            this.cancel.cancel("component unmounting");
+            this.cancel = null;
+        }
     }
 
     onRegistryChange(e: React.FormEvent<HTMLInputElement>): void {
@@ -72,6 +77,10 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     }
 
     submitCredential(): void {
+        if (this.cancel) {
+            return;
+        }
+
         let cred: RegistryCredentials = new RegistryCredentials();
         let service: Docker = new Docker(this.extractDomain(this.state.formRegistry));
 
@@ -83,11 +92,15 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             formMessage: "",
         } as ILoginState);
 
-        service.tryAuthenticate(cred)
+        this.cancel = service.createCancelToken();
+
+        service.tryAuthenticate(cred, this.cancel.token)
             .then((success: boolean) => {
+                this.cancel = null;
 
                 if (success) {
                     this.credService.setRegistryCredentials(service.registryName, cred);
+
                     history.push("/" + service.registryName)
                 }
                 else {
@@ -96,6 +109,8 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                     } as ILoginState);
                 }
             }).catch((err: any) => {
+                this.cancel = null;
+
                 this.setState({
                     formMessage: "Network error"
                 } as ILoginState);
@@ -137,7 +152,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                                 onKeyPress={this.onPasswordKeyPress.bind(this)} />
                         </div>
                         <div className="login-button">
-                            <Button
+                            <Button disabled={this.cancel != null}
                                 buttonType={ButtonType.primary}
                                 onClick={this.submitCredential.bind(this)} >
                                 Log in
