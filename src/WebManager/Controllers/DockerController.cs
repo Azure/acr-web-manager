@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.ContainerRegistry;
+using Microsoft.Azure.ContainerRegistry.Models;
+using Newtonsoft.Json;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
-using WebManager.Services;
 using WebManager.Utility;
 
 namespace WebManager.Controllers
@@ -8,14 +12,6 @@ namespace WebManager.Controllers
     [Route("v2")]
     public class DockerController : Controller
     {
-        private DockerApiService _service;
-
-        public DockerController(DockerApiService service)
-        {
-            _service = service;
-        }
-
-
         public RegistryCredential GetDockerCredential()
         {
             if (!Request.Headers.ContainsKey("Authorization"))
@@ -59,25 +55,35 @@ namespace WebManager.Controllers
                 return new UnauthorizedResult();
             }
 
-            var resp = await _service.Catalog(cred,
-                Request.QueryString.HasValue ? Request.QueryString.Value : "");
+            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
+            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
 
-            if (resp == null)
-            {
-                return new UnauthorizedResult();
+            var user = decodedAuth.Split(":")[0];
+            var password = decodedAuth.Split(":")[1];
+
+            int timeoutInMilliseconds = 1500000;
+            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
+            var client = loginBasic(ct, user, password, cred.Registry);
+
+            try {
+                var repositories = await client.GetRepositoriesAsync();
+                var jsonString = JsonConvert.SerializeObject(repositories);
+                return new ContentResult()
+                {
+                    Content = jsonString,
+                    ContentType = "application/json",
+                    StatusCode = 200
+                };
             }
-
-            if (resp.Item3 != null)
+            catch (AcrErrorsException e)
             {
-                Response.Headers.Add("Link", resp.Item3);
+                return new ContentResult()
+                {
+                    Content = e.Response.Content,
+                    ContentType = "application/json",
+                    StatusCode = (int)e.Response.StatusCode
+                };
             }
-
-            return new ContentResult()
-            {
-                Content = resp.Item1,
-                ContentType = "application/json",
-                StatusCode = (int)resp.Item2
-            };
         }
 
         [HttpGet("{repo}/manifests/{tag}")]
@@ -89,19 +95,36 @@ namespace WebManager.Controllers
                 return new UnauthorizedResult();
             }
 
-            var resp = await _service.Manifest(cred, repo, tag);
+            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
+            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
 
-            if (resp == null)
+            var user = decodedAuth.Split(":")[0];
+            var password = decodedAuth.Split(":")[1];
+
+            int timeoutInMilliseconds = 1500000;
+            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
+            var client = loginBasic(ct, user, password, cred.Registry);
+
+            try
             {
-                return new UnauthorizedResult();
+                var acceptString = "application/vnd.docker.distribution.manifest.v2+json";
+                var manifest = await client.GetManifestAsync(repo,tag, acceptString);
+                var jsonString = JsonConvert.SerializeObject(manifest);
+                return new ContentResult()
+                {
+                    Content = jsonString,
+                    ContentType = "application/json",
+                    StatusCode = 200
+                };
             }
-
-            return new ContentResult()
+            catch (AcrErrorsException e)
             {
-                Content = resp.Item1,
-                ContentType = "application/json",
-                StatusCode = (int)resp.Item2
-            };
+                return new ContentResult() {
+                    Content = e.Response.Content,
+                    ContentType = "application/json",
+                    StatusCode = (int)e.Response.StatusCode
+                };
+            }
         }
 
         /// <summary>
@@ -118,25 +141,36 @@ namespace WebManager.Controllers
                 return new UnauthorizedResult();
             }
 
-            var resp = await _service.ListTags(cred, name,
-                Request.QueryString.HasValue ? Request.QueryString.Value : "");
+            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
+            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
 
-            if (resp == null)
+            var user = decodedAuth.Split(":")[0];
+            var password = decodedAuth.Split(":")[1];
+
+            int timeoutInMilliseconds = 1500000;
+            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
+            var client = loginBasic(ct, user, password, cred.Registry);
+
+            try
             {
-                return new UnauthorizedResult();
+                var tags = await client.GetTagListAsync(name);
+                var jsonString = JsonConvert.SerializeObject(tags);
+                return new ContentResult()
+                {
+                    Content = jsonString,
+                    ContentType = "application/json",
+                    StatusCode = 200
+                };
             }
-
-            if (resp.Item3 != null)
+            catch (AcrErrorsException e)
             {
-                Response.Headers.Add("Link", resp.Item3);
+                return new ContentResult()
+                {
+                    Content = e.Response.Content,
+                    ContentType = "application/json",
+                    StatusCode = (int)e.Response.StatusCode
+                };
             }
-
-            return new ContentResult()
-            {
-                Content = resp.Item1,
-                ContentType = "application/json",
-                StatusCode = (int)resp.Item2
-            };
         }
 
         [HttpGet]
@@ -158,12 +192,34 @@ namespace WebManager.Controllers
                 return new UnauthorizedResult();
             }
 
-            if (await _service.TestCredentials(cred.Registry, cred.BasicAuth))
-            {
+            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
+            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+
+            var user = decodedAuth.Split(":")[0];
+            var password = decodedAuth.Split(":")[1];
+
+            int timeoutInMilliseconds = 1500000;
+            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
+            var client = loginBasic(ct, user, password, cred.Registry);
+            try {
+                await client.GetDockerRegistryV2SupportAsync();
                 return new OkResult();
             }
+            catch (AcrErrorsException e)
+            {
+                return new ContentResult()
+                {
+                    StatusCode = (int)e.Response.StatusCode
+                };
+            }
+        }
 
-            return new UnauthorizedResult();
+        private static AzureContainerRegistryClient loginBasic(CancellationToken ct, string username, string password, string loginUrl)
+        {
+            AcrClientCredentials credentials = new AcrClientCredentials(AcrClientCredentials.LoginMode.Basic, loginUrl, username, password, ct);
+            AzureContainerRegistryClient client = new AzureContainerRegistryClient(credentials);
+            client.LoginUri = "https://" + loginUrl;
+            return client;
         }
     }
 }
