@@ -99,13 +99,21 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
                             newTags.push(tag);
                         }
                     }
-                    for (let tag of value.tags) {
-                        newTags.push(tag);
+                    if (value.tags != null) {
+                        for (let tag of value.tags) {
+                            newTags.push(tag.name);
+                        }
+                        return {
+                            tags: newTags,
+                            hasMoreTags: true
+                        };
                     }
-                    return {
-                        tags: newTags,
-                        hasMoreTags: value.httpLink !== undefined,
-                    };
+                    else {
+                        return {
+                            tags: prevState.tags,
+                            hasMoreTags: false
+                        };
+                    }
                 });
             }).catch((err: any) => {
                 this.cancel = null;

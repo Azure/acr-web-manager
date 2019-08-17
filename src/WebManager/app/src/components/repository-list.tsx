@@ -63,13 +63,21 @@ export class RepositoryList extends React.Component<IRepositoryListProps, IRepos
                                 newRepositories.push(repository);
                             }
                         }
-                        for (let repository of value.repositories) {
-                            newRepositories.push(repository);
+                        if (value.repositories != null) {
+                            for (let repository of value.repositories) {
+                                newRepositories.push(repository);
+                            }
+                            return {
+                                repositories: newRepositories,
+                                hasMoreRepositories: true
+                            };
                         }
-                        return {
-                            repositories: newRepositories,
-                            hasMoreRepositories: value.httpLink !== undefined
-                        };
+                        else {
+                            return {
+                                repositories: prevState.repositories,
+                                hasMoreRepositories: false
+                            };
+                        }
                     });
                 }).catch((err: any) => {
                     this.cancel = null;

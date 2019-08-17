@@ -47,7 +47,7 @@ namespace WebManager.Controllers
         /// Registry: (the name of the registry to access)
         /// </summary>
         [HttpGet("_catalog")]
-        public async Task<IActionResult> Catalog()
+        public async Task<IActionResult> Catalog([FromQuery(Name = "n")] int n = 10, [FromQuery(Name = "last")] string last = "")
         {
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
@@ -63,10 +63,11 @@ namespace WebManager.Controllers
 
             int timeoutInMilliseconds = 1500000;
             CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = loginBasic(ct, user, password, cred.Registry);
+            var client = LoginBasic(ct, user, password, cred.Registry);
 
-            try {
-                var repositories = await client.GetRepositoriesAsync();
+            try
+            {
+                var repositories = await client.GetRepositoriesAsync(last, n);
                 var jsonString = JsonConvert.SerializeObject(repositories);
                 return new ContentResult()
                 {
@@ -103,12 +104,12 @@ namespace WebManager.Controllers
 
             int timeoutInMilliseconds = 1500000;
             CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = loginBasic(ct, user, password, cred.Registry);
+            var client = LoginBasic(ct, user, password, cred.Registry);
 
             try
             {
                 var acceptString = "application/vnd.docker.distribution.manifest.v2+json";
-                var manifest = await client.GetManifestAsync(repo,tag, acceptString);
+                var manifest = await client.GetManifestAsync(repo, tag, acceptString);
                 var jsonString = JsonConvert.SerializeObject(manifest);
                 return new ContentResult()
                 {
@@ -119,7 +120,8 @@ namespace WebManager.Controllers
             }
             catch (AcrErrorsException e)
             {
-                return new ContentResult() {
+                return new ContentResult()
+                {
                     Content = e.Response.Content,
                     ContentType = "application/json",
                     StatusCode = (int)e.Response.StatusCode
@@ -133,7 +135,7 @@ namespace WebManager.Controllers
         /// Registry: (the name of the registry to access)
         /// </summary>
         [HttpGet("{name}/tags/list")]
-        public async Task<IActionResult> ListTags(string name)
+        public async Task<IActionResult> ListTags(string name, [FromQuery(Name = "n")] int n = 10, [FromQuery(Name = "last")] string last = "")
         {
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
@@ -149,11 +151,11 @@ namespace WebManager.Controllers
 
             int timeoutInMilliseconds = 1500000;
             CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = loginBasic(ct, user, password, cred.Registry);
+            var client = LoginBasic(ct, user, password, cred.Registry);
 
             try
             {
-                var tags = await client.GetTagListAsync(name);
+                var tags = await client.GetAcrTagsAsync(name, last, n);
                 var jsonString = JsonConvert.SerializeObject(tags);
                 return new ContentResult()
                 {
@@ -200,8 +202,9 @@ namespace WebManager.Controllers
 
             int timeoutInMilliseconds = 1500000;
             CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = loginBasic(ct, user, password, cred.Registry);
-            try {
+            var client = LoginBasic(ct, user, password, cred.Registry);
+            try
+            {
                 await client.GetDockerRegistryV2SupportAsync();
                 return new OkResult();
             }
@@ -214,7 +217,7 @@ namespace WebManager.Controllers
             }
         }
 
-        private static AzureContainerRegistryClient loginBasic(CancellationToken ct, string username, string password, string loginUrl)
+        private static AzureContainerRegistryClient LoginBasic(CancellationToken ct, string username, string password, string loginUrl)
         {
             AcrClientCredentials credentials = new AcrClientCredentials(AcrClientCredentials.LoginMode.Basic, loginUrl, username, password, ct);
             AzureContainerRegistryClient client = new AzureContainerRegistryClient(credentials);
