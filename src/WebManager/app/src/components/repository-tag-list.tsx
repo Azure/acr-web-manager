@@ -105,7 +105,7 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
                         }
                         return {
                             tags: newTags,
-                            hasMoreTags: true
+                            hasMoreTags: value.httpLink !== undefined
                         };
                     }
                     else {

@@ -69,6 +69,12 @@ namespace WebManager.Controllers
             {
                 var repositories = await client.GetRepositoriesAsync(last, n);
                 var jsonString = JsonConvert.SerializeObject(repositories);
+                if (repositories.Names != null && repositories.Names.Count > 0)
+                {
+                    var lastRepo = repositories.Names[repositories.Names.Count - 1];
+                    var linkHeader = $"</v2/_catalog?last={last}&n={n}&orderby=>; rel=\"next\"";
+                    Response.Headers.Add("Link", linkHeader);
+                }
                 return new ContentResult()
                 {
                     Content = jsonString,
@@ -157,6 +163,12 @@ namespace WebManager.Controllers
             {
                 var tags = await client.GetAcrTagsAsync(name, last, n);
                 var jsonString = JsonConvert.SerializeObject(tags);
+                if (tags.TagsAttributes != null && tags.TagsAttributes.Count > 0)
+                {
+                    var lastTag = tags.TagsAttributes[tags.TagsAttributes.Count - 1].Name;
+                    var linkHeader = $"</acr/v1/{name}/_tags?last={lastTag}&n={n}&orderby=>; rel=\"next\""; 
+                    Response.Headers.Add("Link", linkHeader);
+                }
                 return new ContentResult()
                 {
                     Content = jsonString,

@@ -69,7 +69,7 @@ export class RepositoryList extends React.Component<IRepositoryListProps, IRepos
                             }
                             return {
                                 repositories: newRepositories,
-                                hasMoreRepositories: true
+                                hasMoreRepositories: value.httpLink !== undefined
                             };
                         }
                         else {
