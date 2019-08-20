@@ -1,6 +1,7 @@
 ﻿export class RegistryCredentials {
     basicAuth: string;
     username: string;
+    tokenAuth: string;
 }
 
 export class CredentialService {

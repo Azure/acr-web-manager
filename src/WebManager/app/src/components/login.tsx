@@ -14,6 +14,7 @@ interface ILoginState {
     formRegistry: string
     formUsername: string,
     formPassword: string,
+    formToken: string,
     formMessage: string
 }
 
@@ -28,6 +29,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             formRegistry: "",
             formUsername: "",
             formPassword: "",
+            formToken: "",
             formMessage: "",
         };
     }
@@ -70,6 +72,12 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
         } as ILoginState);
     }
 
+    onTokenChange(e: React.FormEvent<HTMLInputElement>): void {
+        this.setState({
+            formToken: (e.target as HTMLInputElement).value.replace(/[^\x00-\x7F]/g, ""),
+        } as ILoginState);
+    }
+
     onPasswordKeyPress(e: React.KeyboardEvent<HTMLInputElement>): void {
         if (e.charCode == 13) {
             this.submitCredential();
@@ -81,15 +89,24 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             return;
         }
 
+        if ((this.state.formUsername !== "" && this.state.formToken !== "") || (this.state.formPassword !== "" && this.state.formToken !== "")) {
+            this.setState({
+                formMessage: "Specify only one of the two methods of authentication"
+            } as ILoginState);
+            return;
+        }
+
         let cred: RegistryCredentials = new RegistryCredentials();
         let service: Docker = new Docker(this.extractDomain(this.state.formRegistry));
 
         cred.username = this.state.formUsername;
         cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
+        cred.tokenAuth = this.state.formToken;
 
         this.setState({
             formPassword: "",
             formMessage: "",
+            formToken: "",
         } as ILoginState);
 
         this.cancel = service.createCancelToken();
@@ -140,15 +157,26 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                                 placeholder="Registry"
                                 onChange={this.onRegistryChange.bind(this)} />
                         </div>
+                        <text>{`Use registry credentials\n`}</text>
                         <div className="ms-TextField login-field">
                             <input className="ms-TextField-field" type="text"
                                 placeholder="Username"
-                                onChange={this.onUsernameChange.bind(this)} />
+                                onChange={this.onUsernameChange.bind(this)}
+                                disabled={this.state.formToken!=""} />
                         </div>
                         <div className="ms-TextField login-field">
                             <input className="ms-TextField-field" type="password"
                                 placeholder="Password"
                                 onChange={this.onPasswordChange.bind(this)}
+                                disabled={this.state.formToken != ""}
+                                onKeyPress={this.onPasswordKeyPress.bind(this)} />
+                        </div>
+                        <text>{`Or use an AAD access token\n`}</text>
+                        <div className="ms-TextField login-field">
+                            <input className="ms-TextField-field" type="password"
+                                placeholder="AAD access token"
+                                onChange={this.onTokenChange.bind(this)}
+                                disabled={this.state.formUsername != "" || this.state.formPassword!=""}
                                 onKeyPress={this.onPasswordKeyPress.bind(this)} />
                         </div>
                         <div className="login-button">

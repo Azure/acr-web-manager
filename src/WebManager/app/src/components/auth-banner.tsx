@@ -17,6 +17,7 @@ interface IAuthBannerState {
     loggedInAs: string,
     formUsername: string,
     formPassword: string,
+    formToken: string,
     formMessage: string
 }
 
@@ -31,17 +32,19 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
             loggedInAs: null,
             formUsername: "",
             formPassword: "",
+            formToken: "",
             formMessage: ""
         };
     }
 
     componentWillMount(): void {
         let credential = this.credService.getRegistryCredentials(this.props.service.registryName);
-        this.setState({
-            loggedInAs: credential != null ? credential.username : null
-        } as IAuthBannerState);
+
 
         if (credential != null) {
+            this.setState({
+                loggedInAs: credential.tokenAuth != "" ? "AAD user" : credential.username
+            });
             if (this.props.onLogin) {
                 this.props.onLogin();
             }
@@ -73,6 +76,12 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
         }
     }
 
+    onTokenChange(e: React.FormEvent<HTMLInputElement>): void {
+        this.setState({
+            formToken: (e.target as HTMLInputElement).value.replace(/[^\x00-\x7F]/g, ""),
+        } as IAuthBannerState);
+    }
+
     onLogout(): void {
         this.setState({
             loggedInAs: null
@@ -90,12 +99,20 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
             return;
         }
 
+        if ((this.state.formUsername != "" && this.state.formToken != "") || (this.state.formPassword != "" && this.state.formToken != "")) {
+            this.setState({
+                formMessage: "Invalid credentials"
+            } as IAuthBannerState);
+        }
+
         let cred: RegistryCredentials = new RegistryCredentials();
         cred.username = this.state.formUsername;
         cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
+        cred.tokenAuth = this.state.formToken;
 
         this.setState({
-            formPassword: ""
+            formPassword: "",
+            formToken: ""
         } as IAuthBannerState);
 
         this.cancel = this.props.service.createCancelToken();
@@ -106,7 +123,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
 
                 if (success) {
                     this.setState({
-                        loggedInAs: cred.username
+                        loggedInAs: cred.tokenAuth != "" ? "AAD user" : cred.username
                     } as IAuthBannerState);
 
                     this.credService.setRegistryCredentials(this.props.service.registryName, cred);
@@ -134,22 +151,33 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                 <div className="header header-auth-panel ms-bgColor-themeLight">
                     <div className="banner ms-Grid">
                         <div className="ms-Grid-row banner-auth-row">
-                            <div className="ms-Grid-col ms-u-sm3">
+                            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
                                 <div className="ms-TextField">
                                     <input className="ms-TextField-field" type="text"
                                         placeholder="Username"
+                                        disabled={this.state.formToken != ""}
                                         onChange={this.onUsernameChange.bind(this)} />
                                 </div>
                             </div>
-                            <div className="ms-Grid-col ms-u-sm3">
+                            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
                                 <div className="ms-TextField">
                                     <input className="ms-TextField-field" type="password"
                                         placeholder="Password"
+                                        disabled={this.state.formToken != ""}
                                         onChange={this.onPasswordChange.bind(this)}
                                         onKeyPress={this.onPasswordKeyPress.bind(this)} />
                                 </div>
                             </div>
-                            <div className="ms-Grid-col ms-u-sm2">
+                            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
+                                <div className="ms-TextField">
+                                    <input className="ms-TextField-field" type="password"
+                                        placeholder="Aad token"
+                                        disabled={this.state.formUsername != "" || this.state.formPassword != ""}
+                                        onChange={this.onTokenChange.bind(this)}
+                                        onKeyPress={this.onPasswordKeyPress.bind(this)} />
+                                </div>
+                            </div>
+                            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
                                 <div>
                                     <Button className="banner-auth-row-login-button"
                                         disabled={this.cancel != null}
@@ -159,7 +187,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                                     </Button>
                                 </div>
                             </div>
-                            <div className="ms-Grid-col ms-u-sm4">
+                            <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
                                 <span className="ms-fontColor-black ms-font-l banner-auth-row-info">
                                     {this.state.formMessage}
                                 </span>
@@ -200,7 +228,7 @@ class LoginPanel extends React.Component<ILoginPanelProps, {}> {
             return (
                 <div className="banner-login-group">
                     <span className="banner-logged-in ms-font-l ms-fontColor-themeLight">
-                        Logged in as user {this.props.loggedInAs}
+                        Logged in as {this.props.loggedInAs}
                     </span>
                     <span className="banner-logout ms-font-l ms-fontColor-themeLight" onClick={this.props.onLogout}>
                         (log out)

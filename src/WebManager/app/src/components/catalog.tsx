@@ -12,7 +12,7 @@ interface ICatalogState { isLoggedIn: boolean, service: Docker }
 export class Catalog extends React.Component<ICatalogProps, ICatalogState> {
     constructor(props: ICatalogProps) {
         super(props);
-
+        
         this.state = {
             service: new Docker(this.props.match.params.registryName),
             isLoggedIn: false
