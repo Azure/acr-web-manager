@@ -40,11 +40,18 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
     componentWillMount(): void {
         let credential = this.credService.getRegistryCredentials(this.props.service.registryName);
 
-
         if (credential != null) {
-            this.setState({
-                loggedInAs: credential.tokenAuth != "" ? "AAD user" : credential.username
-            });
+            if (credential.tokenAuth != "") {
+                let decodedToken = this.parseJwt(credential.tokenAuth);
+                this.setState({
+                    loggedInAs: decodedToken.unique_name
+                });
+            }
+            else {
+                this.setState({
+                    loggedInAs: credential.username
+                });
+            }
             if (this.props.onLogin) {
                 this.props.onLogin();
             }
@@ -122,9 +129,17 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                 this.cancel = null;
 
                 if (success) {
-                    this.setState({
-                        loggedInAs: cred.tokenAuth != "" ? "AAD user" : cred.username
-                    } as IAuthBannerState);
+                    if (cred.tokenAuth != "") {
+                        let decodedToken = this.parseJwt(cred.tokenAuth);
+                        this.setState({
+                            loggedInAs: decodedToken.unique_name
+                        });
+                    }
+                    else {
+                        this.setState({
+                            loggedInAs: cred.username
+                        });
+                    }
 
                     this.credService.setRegistryCredentials(this.props.service.registryName, cred);
 
@@ -141,6 +156,16 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                 this.cancel = null;
             });
     }
+
+    parseJwt(token: string): any {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+    };
 
     renderAuthPanel(): JSX.Element {
         if (this.state.loggedInAs) {
