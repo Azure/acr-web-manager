@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview8-buster AS build
-RUN apt-get -o Acquire::Check-Valid-Until=false update -yq && apt-get -o Acquire::Check-Valid-Until=false upgrade -yq && apt-get -o Acquire::Check-Valid-Until=false install -yq curl git nano nuget
+RUN apt-get update -yq && apt-get upgrade -yq && apt-get install -yq curl git nano nuget
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && apt-get install -yq nodejs build-essential
 RUN npm install -g npm
 WORKDIR /src 
