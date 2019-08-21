@@ -87,7 +87,7 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
         }
 
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getTagsForRepo(this.props.repositoryName, 10, last, this.cancel.token)
+        this.props.service.getTagsForRepo(encodeURIComponent(this.props.repositoryName), 10, last, this.cancel.token)
             .then((value: { tags: any; httpLink: any; }) => {
                 this.cancel = null;
                 if (!value) return;

@@ -96,6 +96,7 @@ namespace WebManager.Controllers
         [HttpGet("{repo}/manifests/{tag}")]
         public async Task<IActionResult> Manifest(string repo, string tag)
         {
+            repo = System.Web.HttpUtility.UrlDecode(repo);
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
@@ -143,6 +144,7 @@ namespace WebManager.Controllers
         [HttpGet("{name}/tags/list")]
         public async Task<IActionResult> ListTags(string name, [FromQuery(Name = "n")] int n = 10, [FromQuery(Name = "last")] string last = "")
         {
+            name = System.Web.HttpUtility.UrlDecode(name);
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {

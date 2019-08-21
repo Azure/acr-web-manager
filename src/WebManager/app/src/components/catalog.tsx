@@ -32,7 +32,7 @@ export class Catalog extends React.Component<ICatalogProps, ICatalogState> {
     }
 
     onRepositoryClick(repository: string): void {
-        history.push(`/${this.props.match.params.registryName}/${repository}`);
+        history.push(`/${this.props.match.params.registryName}/${encodeURIComponent(repository)}`);
     }
 
     render(): JSX.Element {
