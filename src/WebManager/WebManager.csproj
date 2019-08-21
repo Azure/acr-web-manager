@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.0.0-preview8.19405.7" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.0.0-preview8.19405.7" />
-    <PackageReference Include="Microsoft.Azure.Runtime.ContainerRegistry" Version="1.0.0-dev.20190814.1" />
+    <PackageReference Include="Microsoft.Azure.Runtime.ContainerRegistry" Version="2.0.0-dev.20190820.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.4.0" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="3.6.0">
       <PrivateAssets>all</PrivateAssets>

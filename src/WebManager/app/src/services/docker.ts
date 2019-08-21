@@ -71,8 +71,7 @@ export class Docker {
             params: {},
             headers: {
                 "Registry": this.registryName,
-                "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
-                    "application/vnd.docker.distribution.manifest.v1+json; 0.5",
+                "Accept": "application/vnd.oci.image.manifest.v1+json;q=0.4, application/vnd.docker.distribution.manifest.v2+json;q=0.5, application/vnd.docker.distribution.manifest.list.v2+json;q=0.6",
                 "Authorization": authHeader
             }
         };

@@ -152,17 +152,18 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                         </span>
                     </div>
                     <div className="login-panel">
-                        <div className="ms-TextField login-field">
+                        <div className="ms-TextField login-field textinput">
                             <input className="ms-TextField-field" type="text"
                                 placeholder="Registry"
                                 onChange={this.onRegistryChange.bind(this)} />
+                            <span className="textinputmessage">The Login URL for the registry</span>
                         </div>
                         <text>{`Use registry credentials\n`}</text>
                         <div className="ms-TextField login-field">
                             <input className="ms-TextField-field" type="text"
                                 placeholder="Username"
                                 onChange={this.onUsernameChange.bind(this)}
-                                disabled={this.state.formToken!=""} />
+                                disabled={this.state.formToken != ""} />
                         </div>
                         <div className="ms-TextField login-field">
                             <input className="ms-TextField-field" type="password"
@@ -172,12 +173,13 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                                 onKeyPress={this.onPasswordKeyPress.bind(this)} />
                         </div>
                         <text>{`Or use an AAD access token\n`}</text>
-                        <div className="ms-TextField login-field">
+                        <div className="ms-TextField login-field textinput">
                             <input className="ms-TextField-field" type="password"
                                 placeholder="AAD access token"
                                 onChange={this.onTokenChange.bind(this)}
-                                disabled={this.state.formUsername != "" || this.state.formPassword!=""}
+                                disabled={this.state.formUsername != "" || this.state.formPassword != ""}
                                 onKeyPress={this.onPasswordKeyPress.bind(this)} />
+                            <span className="textinputmessage">To get one you can run az account get-access-token using the Azure CLI</span>
                         </div>
                         <div className="login-button">
                             <Button disabled={this.cancel != null}

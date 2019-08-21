@@ -62,7 +62,7 @@ namespace WebManager.Controllers
             try
             {
                 var client = GetClient(cred);
-                var repositories = await client.GetRepositoriesAsync(last, n);
+                var repositories = await client.GetRepositoryListAsync(last, n);
                 client.Dispose();
                 var jsonString = JsonConvert.SerializeObject(repositories);
                 if (repositories.Names != null && repositories.Names.Count > 0 && repositories.Names.Count >= n)
@@ -102,11 +102,14 @@ namespace WebManager.Controllers
                 return new UnauthorizedResult();
             }
 
-
             try
             {
                 var client = GetClient(cred);
                 var acceptString = "application/vnd.docker.distribution.manifest.v2+json";
+                if (Request.Headers.ContainsKey("Accept"))
+                {
+                    acceptString = Request.Headers["Accept"];
+                }
                 var manifest = await client.GetManifestAsync(repo, tag, acceptString);
                 client.Dispose();
                 var jsonString = JsonConvert.SerializeObject(manifest);
@@ -126,7 +129,7 @@ namespace WebManager.Controllers
                     StatusCode = (int)e.Response.StatusCode
                 };
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return new StatusCodeResult(500);
             }
@@ -149,12 +152,12 @@ namespace WebManager.Controllers
             try
             {
                 var client = GetClient(cred);
-                var tags = await client.GetAcrTagsAsync(name, last, n);
+                var tags = await client.GetTagListAsync(name, last, n);
                 client.Dispose();
                 var jsonString = JsonConvert.SerializeObject(tags);
-                if (tags.TagsAttributes != null && tags.TagsAttributes.Count > 0 && tags.TagsAttributes.Count >= n)
+                if (tags.Tags != null && tags.Tags.Count > 0 && tags.Tags.Count >= n)
                 {
-                    var lastTag = tags.TagsAttributes[tags.TagsAttributes.Count - 1].Name;
+                    var lastTag = tags.Tags[tags.Tags.Count - 1].Name;
                     var linkHeader = $"</acr/v1/{name}/_tags?last={lastTag}&n={n}&orderby=>; rel=\"next\"";
                     Response.Headers.Add("Link", linkHeader);
                 }
@@ -202,7 +205,7 @@ namespace WebManager.Controllers
             try
             {
                 var client = GetClient(cred);
-                await client.GetDockerRegistryV2SupportAsync();
+                await client.CheckV2SupportAsync();
                 client.Dispose();
                 return new OkResult();
             }
@@ -266,15 +269,7 @@ namespace WebManager.Controllers
         {
             string tenant = null; // Tenant is optional
 
-            AcrClientCredentials credentials = new AcrClientCredentials(aadAccessToken, loginUrl, tenant, null, ct,
-            () =>
-            {
-                AcrClientCredentials.Token tok = new AcrClientCredentials.Token();
-                tok.TokenStr = aadAccessToken;
-                tok.Expiration = DateTime.UtcNow.AddMinutes(55);
-                return tok;
-
-            });
+            AcrClientCredentials credentials = new AcrClientCredentials(aadAccessToken, loginUrl, tenant, null, ct);
             AzureContainerRegistryClient client = new AzureContainerRegistryClient(credentials)
             {
                 LoginUri = "https://" + loginUrl
