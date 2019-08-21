@@ -224,6 +224,8 @@ namespace WebManager.Controllers
             {
                 return new ContentResult()
                 {
+                    Content = e.Response.Content,
+                    ContentType = "application/json",
                     StatusCode = (int)e.Response.StatusCode
                 };
             }
