@@ -12,6 +12,8 @@ namespace WebManager.Controllers
     [Route("v2")]
     public class DockerController : Controller
     {
+        const int timeoutInMilliseconds = 1500000;
+
         public RegistryCredential GetDockerCredential()
         {
             if (!Request.Headers.ContainsKey("Registry"))
@@ -130,7 +132,7 @@ namespace WebManager.Controllers
                     StatusCode = (int)e.Response.StatusCode
                 };
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new StatusCodeResult(500);
             }
@@ -228,7 +230,6 @@ namespace WebManager.Controllers
 
         private static AzureContainerRegistryClient GetClient(RegistryCredential cred)
         {
-            int timeoutInMilliseconds = 1500000;
             CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
 
             if (cred.BasicAuth != null && cred.AadOauthToken != null)
