@@ -113,7 +113,7 @@ namespace WebManager.Controllers
                 }
                 var manifest = await client.GetManifestAsync(repo, tag, acceptString);
                 client.Dispose();
-                var jsonString = JsonConvert.SerializeObject(manifest);
+                var jsonString = JsonConvert.SerializeObject((V2Manifest)manifest);
                 return new ContentResult()
                 {
                     Content = jsonString,

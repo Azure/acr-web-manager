@@ -10,7 +10,6 @@ RUN npm install -g npm
 WORKDIR /src 
 COPY . .
 WORKDIR "/src/WebManager/app"
-RUN rm -rf node_modules
 RUN npm install
 WORKDIR "/src/WebManager"
 RUN dotnet restore

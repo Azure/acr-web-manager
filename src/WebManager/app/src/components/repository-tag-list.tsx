@@ -127,6 +127,17 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
             });
     }
 
+    refreshTags(): void {
+        this.setState({
+            tags: null,
+            showTags: this.props.collapsable ? false : true,
+            hasMoreTags: true,
+            error: null
+        } as IRepositoryTagListState, () => {
+            this.getMoreTags();
+        });
+    }
+
     render(): JSX.Element {
         return (
             <div>
@@ -163,6 +174,11 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
                         )
                         :
                         <ul className="ms-List">
+                            <li key="<refresh>" className="ms-ListItem is-selectable repo-list-item-tags-item">
+                                <span className="ms-ListItem-primaryText" onClick={this.refreshTags.bind(this)}>
+                                    Refresh
+                                </span>
+                            </li>
                             {this.renderTagListItems()}
                             {
                                 this.state.tags == null || !this.state.hasMoreTags ?
