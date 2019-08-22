@@ -11,21 +11,21 @@ $ docker run -it -p 5000:80 azurecr/web-manager
 
 ## Build instructions
 
+Make sure you have installed [dotnet core 3.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+
 ```bash
-$ cd src/ACRManager
+$ cd src/WebManager/app
 $ npm install
-$ npm install -g gulp webpack
+$ cd ..
 $ dotnet restore
 $ dotnet run
 ```
 
-## Buiding the Docker image:
-
-- Follow previous instructions up to `dotnet run`
+## Buiding and running the Docker image:
 
 ```bash
-$ dotnet publish -c Release
-$ docker build -t acrmanager bin/Release/netcoreapp1.0/publish
+$ cd src/
+$ docker build -t acrmanager -f WebManager/Dockerfile .
 $ docker run -p 5000:80 -it --rm acrmanager
 ```
 

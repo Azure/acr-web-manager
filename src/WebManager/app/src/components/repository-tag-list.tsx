@@ -57,7 +57,7 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
             return this.state.tags.map((tag: string) => (
                 <li key={tag}
                     className="ms-ListItem is-selectable repo-list-item-tags-item"
-                    onClick={() => { this.props.onTagClick(tag); } }>
+                    onClick={() => { this.props.onTagClick(tag); }}>
                     <i className="ms-Icon ms-Icon--Tag repo-list-item-tags-icon" aria-hidden="true"></i>
                     {tag}
                 </li>
@@ -88,23 +88,34 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
 
         this.cancel = this.props.service.createCancelToken();
         this.props.service.getTagsForRepo(this.props.repositoryName, 10, last, this.cancel.token)
-            .then(value => {
+            .then((value: { tags: any; httpLink: any; }) => {
                 this.cancel = null;
                 if (!value) return;
 
-                this.setState((prevState, props) => {
-                    if (prevState.tags == null) {
-                        prevState.tags = [];
+                this.setState((prevState) => {
+                    let newTags: string[] = []
+                    if (prevState.tags != null) {
+                        for (let tag of prevState.tags) {
+                            newTags.push(tag);
+                        }
                     }
-                    for (let tag of value.tags) {
-                        prevState.tags.push(tag);
+                    if (value.tags != null) {
+                        for (let tag of value.tags) {
+                            newTags.push(tag.name);
+                        }
+                        return {
+                            tags: newTags,
+                            hasMoreTags: value.httpLink !== undefined
+                        };
                     }
-
-                    prevState.hasMoreTags = value.httpLink !== undefined;
-
-                    return prevState;
+                    else {
+                        return {
+                            tags: prevState.tags,
+                            hasMoreTags: false
+                        };
+                    }
                 });
-            }).catch(err => {
+            }).catch((err: any) => {
                 this.cancel = null;
                 this.setState({
                     error: err.toString()

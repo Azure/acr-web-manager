@@ -1,12 +1,12 @@
 ﻿import * as React from "react";
-import { browserHistory } from "react-router";
+import history from './history'
 import { Breadcrumb, IBreadcrumbItem } from "office-ui-fabric-react/lib/Breadcrumb";
 
 import { Docker } from "../services/docker";
 import { AuthBanner } from "./auth-banner";
 import { RepositoryList } from "./repository-list";
 
-export interface ICatalogProps { params: any }
+export interface ICatalogProps { match: any }
 interface ICatalogState { isLoggedIn: boolean, service: Docker }
 
 export class Catalog extends React.Component<ICatalogProps, ICatalogState> {
@@ -14,7 +14,7 @@ export class Catalog extends React.Component<ICatalogProps, ICatalogState> {
         super(props);
 
         this.state = {
-            service: new Docker(this.props.params.registryName),
+            service: new Docker(this.props.match.params.registryName),
             isLoggedIn: false
         };
     }
@@ -32,7 +32,7 @@ export class Catalog extends React.Component<ICatalogProps, ICatalogState> {
     }
 
     onRepositoryClick(repository: string): void {
-        browserHistory.push(`/${this.props.params.registryName}/${repository}`);
+        history.push(`/${this.props.match.params.registryName}/${repository}`);
     }
 
     render(): JSX.Element {
@@ -47,10 +47,10 @@ export class Catalog extends React.Component<ICatalogProps, ICatalogState> {
                         {
                             text: "Home",
                             key: "1",
-                            onClick: () => browserHistory.push("/")
+                            onClick: () => history.push("/")
                         },
                         {
-                            text: this.props.params.registryName,
+                            text: this.props.match.params.registryName,
                             key: "2"
                         }
                     ]} className="breadcrumb" />

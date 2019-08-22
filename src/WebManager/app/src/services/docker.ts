@@ -19,7 +19,7 @@ export class Docker {
     // note: we can't use the Link HTTP header yet because we need to forward requests
     // through the server in order to satisfy CORS policies
     getRepos(maxResults: number | null = 10, last: string = null, cancel: CancelToken = null):
-        Promise<{ repositories: string[], httpLink: string }> {
+        any {
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ repositories: null, httpLink: null });
@@ -28,7 +28,7 @@ export class Docker {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
-            params: { },
+            params: {},
             headers: {
                 "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
@@ -57,7 +57,7 @@ export class Docker {
     }
 
     getManifest(repo: string, tag: string, cancel: CancelToken = null):
-        Promise<{ manifest: string }> {
+        any {
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ manifest: null });
@@ -66,7 +66,7 @@ export class Docker {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
-            params: { },
+            params: {},
             headers: {
                 "Registry": this.registryName,
                 "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
@@ -92,7 +92,7 @@ export class Docker {
     // for whatever reason, the docker registry doesn't respect the tag pagination API...
     // this will just return all the tags at once
     getTagsForRepo(repo: string, maxResults: number | null = 10, last: string = null, cancel: CancelToken = null):
-        Promise<{ tags: string[], httpLink: string }> {
+        any {
         let cred: RegistryCredentials = this.credService.getRegistryCredentials(this.registryName);
         if (!cred) {
             return Promise.resolve({ tags: null, httpLink: null });
@@ -101,7 +101,7 @@ export class Docker {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
-            params: { },
+            params: {},
             headers: {
                 "Registry": this.registryName,
                 "Authorization": "Basic " + cred.basicAuth
@@ -134,7 +134,7 @@ export class Docker {
             });
     }
 
-    tryAuthenticate(cred: RegistryCredentials, cancel: CancelToken = null): Promise<boolean> {
+    tryAuthenticate(cred: RegistryCredentials, cancel: CancelToken = null): any {
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
