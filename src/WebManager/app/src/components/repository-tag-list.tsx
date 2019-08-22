@@ -93,6 +93,12 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
                 if (!value) return;
 
                 this.setState((prevState) => {
+                    if (value.tags == null && prevState.tags == null) {
+                        this.cancel = null;
+                        this.setState({
+                            error: "No tags were found"
+                        } as IRepositoryTagListState);
+                    }
                     let newTags: string[] = []
                     if (prevState.tags != null) {
                         for (let tag of prevState.tags) {
