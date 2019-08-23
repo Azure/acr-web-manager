@@ -118,43 +118,54 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
         cred.tokenAuth = this.state.formToken;
 
         this.setState({
+            formUsername: "",
             formPassword: "",
-            formToken: ""
-        } as IAuthBannerState);
+            formToken: "",
+            formMessage: ""
+        } as IAuthBannerState, () => {
+            this.cancel = this.props.service.createCancelToken();
 
-        this.cancel = this.props.service.createCancelToken();
+            this.props.service.tryAuthenticate(cred, this.cancel.token)
+                .then((success: boolean) => {
+                    this.cancel = null;
 
-        this.props.service.tryAuthenticate(cred, this.cancel.token)
-            .then((success: boolean) => {
-                this.cancel = null;
+                    if (success) {
+                        if (cred.tokenAuth != "") {
+                            let decodedToken = this.parseJwt(cred.tokenAuth);
+                            this.setState({
+                                loggedInAs: decodedToken.unique_name
+                            });
+                        }
+                        else {
+                            this.setState({
+                                loggedInAs: cred.username
+                            });
+                        }
 
-                if (success) {
-                    if (cred.tokenAuth != "") {
-                        let decodedToken = this.parseJwt(cred.tokenAuth);
-                        this.setState({
-                            loggedInAs: decodedToken.unique_name
-                        });
+                        this.credService.setRegistryCredentials(this.props.service.registryName, cred);
+
+                        if (this.props.onLogin) {
+                            this.props.onLogin();
+                        }
                     }
                     else {
                         this.setState({
-                            loggedInAs: cred.username
-                        });
+                            formMessage: "Invalid credentials"
+                        } as IAuthBannerState);
+                        (document.getElementById("usertext") as HTMLInputElement).value = "";
+                        (document.getElementById("passwordtext") as HTMLInputElement).value = "";
+                        (document.getElementById("tokentext") as HTMLInputElement).value = "";
                     }
-
-                    this.credService.setRegistryCredentials(this.props.service.registryName, cred);
-
-                    if (this.props.onLogin) {
-                        this.props.onLogin();
-                    }
-                }
-                else {
+                }).catch((err: any) => {
+                    this.cancel = null;
                     this.setState({
-                        formMessage: "Invalid credentials"
+                        formMessage: "Network error"
                     } as IAuthBannerState);
-                }
-            }).catch((err: any) => {
-                this.cancel = null;
-            });
+                    (document.getElementById("usertext") as HTMLInputElement).value = "";
+                    (document.getElementById("passwordtext") as HTMLInputElement).value = "";
+                    (document.getElementById("tokentext") as HTMLInputElement).value = "";
+                });
+        });
     }
 
     parseJwt(token: string): any {
@@ -178,7 +189,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                         <div className="ms-Grid-row banner-auth-row">
                             <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
                                 <div className="ms-TextField">
-                                    <input className="ms-TextField-field" type="text"
+                                    <input id="usertext" className="ms-TextField-field" type="text"
                                         placeholder="Username"
                                         disabled={this.state.formToken != ""}
                                         onChange={this.onUsernameChange.bind(this)} />
@@ -186,7 +197,7 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                             </div>
                             <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
                                 <div className="ms-TextField">
-                                    <input className="ms-TextField-field" type="password"
+                                    <input id="passwordtext" className="ms-TextField-field" type="password"
                                         placeholder="Password"
                                         disabled={this.state.formToken != ""}
                                         onChange={this.onPasswordChange.bind(this)}
@@ -195,8 +206,8 @@ export class AuthBanner extends React.Component<IAuthBannerProps, IAuthBannerSta
                             </div>
                             <div className="ms-Grid-col ms-sm6 ms-md4 ms-lg2">
                                 <div className="ms-TextField">
-                                    <input className="ms-TextField-field" type="password"
-                                        placeholder="Aad token"
+                                    <input id="tokentext" className="ms-TextField-field" type="password"
+                                        placeholder="AAD token"
                                         disabled={this.state.formUsername != "" || this.state.formPassword != ""}
                                         onChange={this.onTokenChange.bind(this)}
                                         onKeyPress={this.onPasswordKeyPress.bind(this)} />

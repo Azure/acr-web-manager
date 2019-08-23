@@ -103,12 +103,6 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
         cred.basicAuth = btoa(this.state.formUsername + ":" + this.state.formPassword);
         cred.tokenAuth = this.state.formToken;
 
-        this.setState({
-            formPassword: "",
-            formMessage: "",
-            formToken: "",
-        } as ILoginState);
-
         this.cancel = service.createCancelToken();
 
         service.tryAuthenticate(cred, this.cancel.token)
