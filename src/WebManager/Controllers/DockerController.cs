@@ -12,8 +12,15 @@ namespace WebManager.Controllers
     [Route("v2")]
     public class DockerController : Controller
     {
+        const int timeoutInMilliseconds = 1500000;
+
         public RegistryCredential GetDockerCredential()
         {
+            if (!Request.Headers.ContainsKey("Registry"))
+            {
+                return null;
+            }
+
             if (!Request.Headers.ContainsKey("Authorization"))
             {
                 return null;
@@ -26,19 +33,18 @@ namespace WebManager.Controllers
                 return null;
             }
 
-            if (!header[0].StartsWith("Basic "))
+            if (header[0].StartsWith("Basic "))
             {
-                return null;
+                string basicAuth = header[0].Substring("Basic ".Length);
+                return new RegistryCredential() { BasicAuth = basicAuth, Registry = Request.Headers["Registry"] };
             }
 
-            string basicAuth = header[0].Substring("Basic ".Length);
-
-            if (!Request.Headers.ContainsKey("Registry"))
+            if (header[0].StartsWith("Bearer "))
             {
-                return null;
+                string bearerAuth = header[0].Substring("Bearer ".Length);
+                return new RegistryCredential() { AadOauthToken = bearerAuth, Registry = Request.Headers["Registry"] };
             }
-
-            return new RegistryCredential() { BasicAuth = basicAuth, Registry = Request.Headers["Registry"] };
+            return null;
         }
 
         /// <summary>
@@ -55,21 +61,14 @@ namespace WebManager.Controllers
                 return new UnauthorizedResult();
             }
 
-            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
-            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-
-            var user = decodedAuth.Split(":")[0];
-            var password = decodedAuth.Split(":")[1];
-
-            int timeoutInMilliseconds = 1500000;
-            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = LoginBasic(ct, user, password, cred.Registry);
+            AzureContainerRegistryClient client = null;
 
             try
             {
-                var repositories = await client.GetRepositoriesAsync(last, n);
+                client = GetClient(cred);
+                var repositories = await client.GetRepositoryListAsync(last, n);
                 var jsonString = JsonConvert.SerializeObject(repositories);
-                if (repositories.Names != null && repositories.Names.Count > 0)
+                if (repositories.Names != null && repositories.Names.Count > 0 && repositories.Names.Count >= n)
                 {
                     var lastRepo = repositories.Names[repositories.Names.Count - 1];
                     var linkHeader = $"</v2/_catalog?last={last}&n={n}&orderby=>; rel=\"next\"";
@@ -91,30 +90,37 @@ namespace WebManager.Controllers
                     StatusCode = (int)e.Response.StatusCode
                 };
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return new StatusCodeResult(500);
+            }
+            finally
+            {
+                client?.Dispose();
+            }
         }
 
         [HttpGet("{repo}/manifests/{tag}")]
         public async Task<IActionResult> Manifest(string repo, string tag)
         {
+            repo = System.Web.HttpUtility.UrlDecode(repo);
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
             }
 
-            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
-            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-
-            var user = decodedAuth.Split(":")[0];
-            var password = decodedAuth.Split(":")[1];
-
-            int timeoutInMilliseconds = 1500000;
-            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = LoginBasic(ct, user, password, cred.Registry);
+            AzureContainerRegistryClient client = null;
 
             try
             {
+                client = GetClient(cred);
                 var acceptString = "application/vnd.docker.distribution.manifest.v2+json";
+                if (Request.Headers.ContainsKey("Accept"))
+                {
+                    acceptString = Request.Headers["Accept"];
+                }
                 var manifest = await client.GetManifestAsync(repo, tag, acceptString);
                 var jsonString = JsonConvert.SerializeObject(manifest);
                 return new ContentResult()
@@ -133,6 +139,15 @@ namespace WebManager.Controllers
                     StatusCode = (int)e.Response.StatusCode
                 };
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return new StatusCodeResult(500);
+            }
+            finally
+            {
+                client?.Dispose();
+            }
         }
 
         /// <summary>
@@ -143,30 +158,24 @@ namespace WebManager.Controllers
         [HttpGet("{name}/tags/list")]
         public async Task<IActionResult> ListTags(string name, [FromQuery(Name = "n")] int n = 10, [FromQuery(Name = "last")] string last = "")
         {
+            name = System.Web.HttpUtility.UrlDecode(name);
             RegistryCredential cred = GetDockerCredential();
             if (cred == null)
             {
                 return new UnauthorizedResult();
             }
 
-            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
-            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-
-            var user = decodedAuth.Split(":")[0];
-            var password = decodedAuth.Split(":")[1];
-
-            int timeoutInMilliseconds = 1500000;
-            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = LoginBasic(ct, user, password, cred.Registry);
+            AzureContainerRegistryClient client = null;
 
             try
             {
-                var tags = await client.GetAcrTagsAsync(name, last, n);
+                client = GetClient(cred);
+                var tags = await client.GetTagListAsync(name, last, n);
                 var jsonString = JsonConvert.SerializeObject(tags);
-                if (tags.TagsAttributes != null && tags.TagsAttributes.Count > 0)
+                if (tags.Tags != null && tags.Tags.Count > 0 && tags.Tags.Count >= n)
                 {
-                    var lastTag = tags.TagsAttributes[tags.TagsAttributes.Count - 1].Name;
-                    var linkHeader = $"</acr/v1/{name}/_tags?last={lastTag}&n={n}&orderby=>; rel=\"next\""; 
+                    var lastTag = tags.Tags[tags.Tags.Count - 1].Name;
+                    var linkHeader = $"</acr/v1/{name}/_tags?last={lastTag}&n={n}&orderby=>; rel=\"next\"";
                     Response.Headers.Add("Link", linkHeader);
                 }
                 return new ContentResult()
@@ -184,6 +193,15 @@ namespace WebManager.Controllers
                     ContentType = "application/json",
                     StatusCode = (int)e.Response.StatusCode
                 };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return new StatusCodeResult(500);
+            }
+            finally
+            {
+                client?.Dispose();
             }
         }
 
@@ -206,18 +224,12 @@ namespace WebManager.Controllers
                 return new UnauthorizedResult();
             }
 
-            var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
-            var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            AzureContainerRegistryClient client = null;
 
-            var user = decodedAuth.Split(":")[0];
-            var password = decodedAuth.Split(":")[1];
-
-            int timeoutInMilliseconds = 1500000;
-            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
-            var client = LoginBasic(ct, user, password, cred.Registry);
             try
             {
-                await client.GetDockerRegistryV2SupportAsync();
+                client = GetClient(cred);
+                await client.CheckV2SupportAsync();
                 return new OkResult();
             }
             catch (AcrErrorsException e)
@@ -229,13 +241,66 @@ namespace WebManager.Controllers
                     StatusCode = (int)e.Response.StatusCode
                 };
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return new StatusCodeResult(500);
+            }
+            finally
+            {
+                client?.Dispose();
+            }
+        }
+
+        private static AzureContainerRegistryClient GetClient(RegistryCredential cred)
+        {
+            CancellationToken ct = new CancellationTokenSource(timeoutInMilliseconds).Token;
+
+            if (cred.BasicAuth != null && cred.AadOauthToken != null)
+            {
+                // Only one authentication mechanism needs to be specified.
+                return null;
+            }
+
+            if (cred.BasicAuth != null)
+            {
+                // Basic Auth
+                var base64EncodedBytes = System.Convert.FromBase64String(cred.BasicAuth);
+                var decodedAuth = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+
+                var user = decodedAuth.Split(":")[0];
+                var password = decodedAuth.Split(":")[1];
+                return LoginBasic(ct, user, password, cred.Registry);
+
+            }
+
+            if (cred.AadOauthToken != null)
+            {
+                // Bearer Auth
+                return LoginAad(ct, cred.AadOauthToken, cred.Registry);
+            }
+            return null;
         }
 
         private static AzureContainerRegistryClient LoginBasic(CancellationToken ct, string username, string password, string loginUrl)
         {
             AcrClientCredentials credentials = new AcrClientCredentials(AcrClientCredentials.LoginMode.Basic, loginUrl, username, password, ct);
-            AzureContainerRegistryClient client = new AzureContainerRegistryClient(credentials);
-            client.LoginUri = "https://" + loginUrl;
+            AzureContainerRegistryClient client = new AzureContainerRegistryClient(credentials)
+            {
+                LoginUri = "https://" + loginUrl
+            };
+            return client;
+        }
+
+        private static AzureContainerRegistryClient LoginAad(CancellationToken ct, string aadAccessToken, string loginUrl)
+        {
+            string tenant = null; // Tenant is optional
+
+            AcrClientCredentials credentials = new AcrClientCredentials(aadAccessToken, loginUrl, tenant, null, ct);
+            AzureContainerRegistryClient client = new AzureContainerRegistryClient(credentials)
+            {
+                LoginUri = "https://" + loginUrl
+            };
             return client;
         }
     }

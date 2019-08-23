@@ -51,7 +51,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                             onClick: () => history.push("/" + this.props.match.params.registryName)
                         },
                         {
-                            text: this.props.match.params.repositoryName,
+                            text: decodeURIComponent(this.props.match.params.repositoryName),
                             key: "3"
                         }
                     ]} className="breadcrumb" />
@@ -61,7 +61,7 @@ export class Repository extends React.Component<IRepositoryProps, IRepositorySta
                             <div>
                                 <RepositoryTagViewer
                                     service={this.state.service}
-                                    repositoryName={this.props.match.params.repositoryName}
+                                    repositoryName={decodeURIComponent(this.props.match.params.repositoryName)}
                                     />
                             </div>
                     }

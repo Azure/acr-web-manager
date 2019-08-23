@@ -52,36 +52,45 @@ export class RepositoryList extends React.Component<IRepositoryListProps, IRepos
 
         this.props.service.getRepos(10, lastRepo, this.cancel.token)
             .then((value: { repositories: any; httpLink: any; }) => {
-                    this.cancel = null;
+                this.cancel = null;
 
-                    if (!value) return;
+                if (!value) return;
 
-                    this.setState((prevState) => {
-                        let newRepositories: string[] = []
-                        if (prevState.repositories != null) {
-                            for (let repository of prevState.repositories) {
-                                newRepositories.push(repository);
-                            }
+                this.setState((prevState) => {
+                    let newRepositories: string[] = []
+                    if (prevState.repositories != null) {
+                        for (let repository of prevState.repositories) {
+                            newRepositories.push(repository);
                         }
-                        if (value.repositories != null) {
-                            for (let repository of value.repositories) {
-                                newRepositories.push(repository);
-                            }
-                            return {
-                                repositories: newRepositories,
-                                hasMoreRepositories: value.httpLink !== undefined
-                            };
+                    }
+                    if (value.repositories != null) {
+                        for (let repository of value.repositories) {
+                            newRepositories.push(repository);
                         }
-                        else {
-                            return {
-                                repositories: prevState.repositories,
-                                hasMoreRepositories: false
-                            };
-                        }
-                    });
-                }).catch((err: any) => {
-                    this.cancel = null;
+                        return {
+                            repositories: newRepositories,
+                            hasMoreRepositories: value.httpLink !== undefined
+                        };
+                    }
+                    else {
+                        return {
+                            repositories: prevState.repositories,
+                            hasMoreRepositories: false
+                        };
+                    }
                 });
+            }).catch((err: any) => {
+                this.cancel = null;
+            });
+    }
+
+    refreshRepos(): void {
+        this.setState({
+            repositories: null,
+            hasMoreRepositories: true
+        } as IRepositoryListState, () => {
+            this.getMoreRepos();
+        });
     }
 
     renderRepositories(): JSX.Element[] {
@@ -90,7 +99,7 @@ export class RepositoryList extends React.Component<IRepositoryListProps, IRepos
                 key={repository}
                 repositoryName={repository}
                 service={this.props.service}
-                onClick={() => { this.props.onRepositoryClick(repository); } } />
+                onClick={() => { this.props.onRepositoryClick(repository); }} />
         ));
     }
 
@@ -99,6 +108,11 @@ export class RepositoryList extends React.Component<IRepositoryListProps, IRepos
             if (this.state.repositories.length > 0) {
                 return (
                     <ul className="ms-List">
+                        <li key="<refresh>" className="ms-ListItem is-selectable repo-list-item clickable">
+                            <span className="ms-ListItem-primaryText" onClick={this.refreshRepos.bind(this)}>
+                                Refresh
+                             </span>
+                        </li>
                         {this.renderRepositories()}
                         {
                             this.state.repositories == null || !this.state.hasMoreRepositories ?

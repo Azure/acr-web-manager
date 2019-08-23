@@ -87,12 +87,18 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
         }
 
         this.cancel = this.props.service.createCancelToken();
-        this.props.service.getTagsForRepo(this.props.repositoryName, 10, last, this.cancel.token)
+        this.props.service.getTagsForRepo(encodeURIComponent(this.props.repositoryName), 10, last, this.cancel.token)
             .then((value: { tags: any; httpLink: any; }) => {
                 this.cancel = null;
                 if (!value) return;
 
                 this.setState((prevState) => {
+                    if (value.tags == null && prevState.tags == null) {
+                        this.cancel = null;
+                        this.setState({
+                            error: "No tags were found"
+                        } as IRepositoryTagListState);
+                    }
                     let newTags: string[] = []
                     if (prevState.tags != null) {
                         for (let tag of prevState.tags) {
@@ -125,6 +131,17 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
                     this.props.onLoadFailure(err);
                 }
             });
+    }
+
+    refreshTags(): void {
+        this.setState({
+            tags: null,
+            showTags: this.props.collapsable ? false : true,
+            hasMoreTags: true,
+            error: null
+        } as IRepositoryTagListState, () => {
+            this.getMoreTags();
+        });
     }
 
     render(): JSX.Element {
@@ -163,6 +180,11 @@ export class RepositoryTagList extends React.Component<IRepositoryTagListProps, 
                         )
                         :
                         <ul className="ms-List">
+                            <li key="<refresh>" className="ms-ListItem is-selectable repo-list-item-tags-item">
+                                <span className="ms-ListItem-primaryText" onClick={this.refreshTags.bind(this)}>
+                                    Refresh
+                                </span>
+                            </li>
                             {this.renderTagListItems()}
                             {
                                 this.state.tags == null || !this.state.hasMoreTags ?

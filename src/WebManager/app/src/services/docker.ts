@@ -25,13 +25,14 @@ export class Docker {
             return Promise.resolve({ repositories: null, httpLink: null });
         }
 
+        let authHeader: string = this.getAuthHeader(cred)
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
             params: {},
             headers: {
                 "Registry": this.registryName,
-                "Authorization": "Basic " + cred.basicAuth
+                "Authorization": authHeader
             }
         };
 
@@ -63,15 +64,15 @@ export class Docker {
             return Promise.resolve({ manifest: null });
         }
 
+        let authHeader: string = this.getAuthHeader(cred)
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
             params: {},
             headers: {
                 "Registry": this.registryName,
-                "Accept": "application/vnd.docker.distribution.manifest.v2+json; 0.6, " +
-                    "application/vnd.docker.distribution.manifest.v1+json; 0.5",
-                "Authorization": "Basic " + cred.basicAuth
+                "Accept": "application/vnd.oci.image.manifest.v1+json;q=0.4, application/vnd.docker.distribution.manifest.v2+json;q=0.5, application/vnd.docker.distribution.manifest.list.v2+json;q=0.6",
+                "Authorization": authHeader
             }
         };
 
@@ -98,13 +99,14 @@ export class Docker {
             return Promise.resolve({ tags: null, httpLink: null });
         }
 
+        let authHeader: string = this.getAuthHeader(cred)
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
             params: {},
             headers: {
                 "Registry": this.registryName,
-                "Authorization": "Basic " + cred.basicAuth
+                "Authorization": authHeader
             }
         };
 
@@ -135,12 +137,13 @@ export class Docker {
     }
 
     tryAuthenticate(cred: RegistryCredentials, cancel: CancelToken = null): any {
+        let authHeader:string = this.getAuthHeader(cred)
         let config: AxiosRequestConfig = {
             cancelToken: cancel,
             baseURL: this.registryEndpoint,
             headers: {
                 "Registry": this.registryName,
-                "Authorization": "Basic " + cred.basicAuth
+                "Authorization": authHeader
             }
         }
 
@@ -171,5 +174,15 @@ export class Docker {
                     return Promise.reject(e);
                 }
             });
+    }
+
+    getAuthHeader(cred: RegistryCredentials): string {
+        if (cred.basicAuth !== "Og==") {
+            return "Basic " + cred.basicAuth;
+        }
+        if (cred.tokenAuth !== "") {
+            return "Bearer " + cred.tokenAuth;
+        }
+        return "";
     }
 }

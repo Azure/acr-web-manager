@@ -31,7 +31,7 @@ export class RepositoryTagViewer extends React.Component<IRepositoryTagViewerPro
         }
         this.cancel = this.props.service.createCancelToken();
 
-        this.props.service.getManifest(this.props.repositoryName, tag, this.cancel.token)
+        this.props.service.getManifest(encodeURIComponent(this.props.repositoryName), tag, this.cancel.token)
             .then((value: {manifest: any}) => {
                 this.cancel = null;
                 if (!value) return;

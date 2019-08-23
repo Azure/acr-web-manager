@@ -60,7 +60,7 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
                 pairs.push({ key: key, value: this.renderValue(value[key]) });
             }
         }
-        
+
         return (
             <div>
                 {
@@ -93,12 +93,14 @@ export class ManifestViewer extends React.Component<IManifestViewerProps, IManif
         let props: { key: string, value: JSX.Element }[] = [];
 
         for (let key in value) {
-            if (value.hasOwnProperty(key)) {
-                if (key == "v1Compatibility") {
-                    props.push({ key: key, value: this.renderJson(value[key]) });
-                }
-                else {
-                    props.push({ key: key, value: this.renderValue(value[key]) });
+            if (value[key] !== null) {
+                if (value.hasOwnProperty(key)) {
+                    if (key == "v1Compatibility") {
+                        props.push({ key: key, value: this.renderJson(value[key]) });
+                    }
+                    else {
+                        props.push({ key: key, value: this.renderValue(value[key]) });
+                    }
                 }
             }
         }
