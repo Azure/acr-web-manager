@@ -1,13 +1,13 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0-preview8-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview8-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-buster AS build
 RUN apt-get update -yq && apt-get upgrade -yq && apt-get install -yq curl git nano nuget
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && apt-get install -yq nodejs build-essential
 RUN npm install -g npm
-WORKDIR /src 
+WORKDIR /src
 COPY . .
 WORKDIR "/src/WebManager/app"
 RUN rm -rf node_modules
