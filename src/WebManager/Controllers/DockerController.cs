@@ -114,9 +114,10 @@ namespace WebManager.Controllers
 
             try
             {
-                var acceptString = "application/vnd.docker.distribution.manifest.v2+json";
+                var acceptString = MediaTypeHelper.ManifestAcceptMediaTypes;
                 var manifest = await client.GetManifestAsync(repo, tag, acceptString);
                 var jsonString = JsonConvert.SerializeObject(manifest);
+
                 return new ContentResult()
                 {
                     Content = jsonString,
@@ -166,7 +167,7 @@ namespace WebManager.Controllers
                 if (tags.TagsAttributes != null && tags.TagsAttributes.Count > 0)
                 {
                     var lastTag = tags.TagsAttributes[tags.TagsAttributes.Count - 1].Name;
-                    var linkHeader = $"</acr/v1/{name}/_tags?last={lastTag}&n={n}&orderby=>; rel=\"next\""; 
+                    var linkHeader = $"</acr/v1/{name}/_tags?last={lastTag}&n={n}&orderby=>; rel=\"next\"";
                     Response.Headers.Add("Link", linkHeader);
                 }
                 return new ContentResult()
