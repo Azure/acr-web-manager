@@ -13,7 +13,7 @@
     "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "es6-promise": "^4.2.8",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "office-ui-fabric-react": "^7.25.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
