@@ -26,7 +26,7 @@
     "typescript-eslint": "^0.0.1-alpha.0"
   },
   "devDependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.3",
     "cross-env": "^5.2.0"
   },
   "eslintConfig": {
